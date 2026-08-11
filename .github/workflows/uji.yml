@@ -1,0 +1,82 @@
+name: uji
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gerbang uji
+        if: github.event_name == 'pull_request'
+        # Nama cabang dilewatkan lewat variabel lingkungan, bukan disisipkan
+        # langsung ke dalam perintah. Nilai ${{ }} ditempelkan sebagai teks
+        # mentah sebelum shell berjalan, sehingga nama cabang yang memuat
+        # tanda kutip atau titik koma bisa menjadi perintah tambahan.
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./.github/skrip/periksa_uji.sh "origin/$BASE_REF"
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Pasang dependensi
+        working-directory: backend
+        run: uv sync --all-groups
+
+      - name: Gaya penulisan
+        working-directory: backend
+        run: uv run ruff check .
+
+      - name: Pemeriksaan tipe
+        working-directory: backend
+        run: uv run mypy app skrip tests
+
+      - name: Uji
+        working-directory: backend
+        # PostgreSQL dibawa pgserver sebagai dependensi Python, sehingga
+        # lingkungan uji di CI persis sama dengan di laptop (ADR-0009).
+        # Tidak ada layanan terpisah yang perlu dinyalakan di sini.
+        run: uv run pytest -v
+
+      - name: Kerentanan dependensi
+        working-directory: backend
+        run: uv run pip-audit
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Pasang dependensi
+        working-directory: frontend
+        run: npm ci
+
+      - name: Pemeriksaan tipe
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Uji
+        working-directory: frontend
+        run: npx vitest run
+
+      - name: Bangun
+        working-directory: frontend
+        run: npm run build
+
+      - name: Kerentanan dependensi
+        working-directory: frontend
+        run: npm audit --audit-level=high

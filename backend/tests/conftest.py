@@ -1,17 +1,26 @@
-import shutil
-import tempfile
-from collections.abc import Iterator
-from pathlib import Path
+import os
 
-import pgserver
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import Engine, create_engine
-from sqlalchemy.orm import Session, sessionmaker
+# Disetel SEBELUM modul aplikasi diimpor, karena Pengaturan dibaca saat
+# impor dan RAHASIA_JWT wajib ada. Tanpa ini, uji hanya berjalan di mesin
+# yang kebetulan punya backend/.env, dan berkas itu tidak ikut ter-commit.
+# Nilai di bawah khusus uji dan tidak pernah dipakai di mana pun.
+os.environ.setdefault("RAHASIA_JWT", "rahasia-khusus-uji-jangan-dipakai-di-mana-pun")
+os.environ.setdefault("LINGKUNGAN", "pengembangan")
 
-from app.basisdata import ambil_sesi
-from app.main import buat_aplikasi
-from app.model.dasar import Dasar
+import shutil  # noqa: E402
+import tempfile  # noqa: E402
+from collections.abc import Iterator  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+import pgserver  # noqa: E402
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import Engine, create_engine  # noqa: E402
+from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
+
+from app.basisdata import ambil_sesi  # noqa: E402
+from app.main import buat_aplikasi  # noqa: E402
+from app.model.dasar import Dasar  # noqa: E402
 
 
 @pytest.fixture(scope="session")

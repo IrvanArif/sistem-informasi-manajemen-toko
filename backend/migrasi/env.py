@@ -16,7 +16,7 @@ from app.konfigurasi import url_basisdata
 # Seluruh tabel harus diimpor di sini agar terdaftar di metadata dan
 # terbaca oleh --autogenerate. Tabel yang lupa diimpor akan diam-diam
 # dianggap "tidak ada" lalu dihapus oleh migrasi berikutnya.
-from app.model import pengguna  # noqa: F401
+from app.model import pengguna, token  # noqa: F401
 from app.model.dasar import Dasar
 
 config = context.config

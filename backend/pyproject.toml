@@ -70,3 +70,7 @@ testpaths = ["tests"]
 # Tanpa ini, pytest tidak menemukan paket `app` dan `skrip`, karena proyek
 # ini dijalankan langsung dari sumbernya dan tidak dipasang sebagai paket.
 pythonpath = ["."]
+
+# Migrasi dibangkitkan otomatis oleh Alembic dan kerap melanggar batas
+# panjang baris. Setelah membuat migrasi baru, jalankan:
+#   uv run ruff format migrasi/versions && uv run ruff check --fix migrasi

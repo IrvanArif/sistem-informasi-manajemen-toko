@@ -1,4 +1,4 @@
-# ADR-0003 — HPP memakai rata-rata bergerak, bukan FIFO
+# ADR-0003: HPP memakai rata-rata bergerak, bukan FIFO
 
 - **Tanggal:** 2026-08-07
 - **Status:** Diterima
@@ -18,7 +18,7 @@ hpp_baru = (stok_lama × hpp_lama + jumlah_masuk × harga_beli_dasar)
 
 Bila `stok_lama` nol atau negatif, `hpp_baru = harga_beli_dasar`. Penjualan tidak pernah mengubah HPP.
 
-HPP disimpan `NUMERIC(14,4)` — satu-satunya pengecualian terhadap aturan "uang selalu bilangan bulat rupiah", karena ia tarif turunan yang dikalikan faktor satuan, bukan jumlah yang dibayarkan.
+HPP disimpan `NUMERIC(14,4)`, satu-satunya pengecualian terhadap aturan "uang selalu bilangan bulat rupiah", karena ia tarif turunan yang dikalikan faktor satuan, bukan jumlah yang dibayarkan.
 
 ## Alasan
 
@@ -32,10 +32,10 @@ Untuk toko kelontong dengan barang yang harganya bergerak perlahan, ketelitian t
 
 **Harga beli terakhir.** Paling sederhana, tetapi satu kiriman mahal langsung membuat seluruh stok lama tampak bermodal tinggi, dan laba melonjak-lonjak tanpa alasan nyata.
 
-**Tanpa HPP sama sekali.** Berarti tidak ada laporan laba — padahal itu kebutuhan pemilik nomor satu.
+**Tanpa HPP sama sekali.** Berarti tidak ada laporan laba, padahal itu kebutuhan pemilik nomor satu.
 
 ## Konsekuensi
 
 - Laba per transaksi sedikit meleset dibanding FIFO; totalnya sepanjang waktu tetap benar.
-- Nilai persediaan dihitung `Σ(stok × hpp)` — sederhana dan langsung.
-- Barang yang terjual sebelum pernah dicatat masuk (lewat "tambah cepat") ber-HPP nol sampai penerimaan pertamanya. Labanya akan tampak terlalu besar sampai saat itu — ini konsekuensi yang diterima, dan produk seperti itu ditandai `perlu_dilengkapi` agar cepat dibereskan.
+- Nilai persediaan dihitung `Σ(stok × hpp)`, sederhana dan langsung.
+- Barang yang terjual sebelum pernah dicatat masuk (lewat "tambah cepat") ber-HPP nol sampai penerimaan pertamanya. Labanya akan tampak terlalu besar sampai saat itu. Ini konsekuensi yang diterima, dan produk seperti itu ditandai `perlu_dilengkapi` agar cepat dibereskan.

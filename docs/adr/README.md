@@ -2,7 +2,7 @@
 
 Setiap berkas di sini mencatat **satu keputusan**: apa konteksnya, apa yang diputuskan, kenapa, apa alternatif yang ditolak, dan apa konsekuensinya.
 
-Gunanya bukan dokumentasi. Gunanya adalah supaya enam bulan lagi — saat ada yang bertanya "kenapa tidak pakai FIFO saja?" — jawabannya sudah tertulis lengkap dengan alasan yang berlaku saat itu, dan bisa dinilai apakah alasannya masih berlaku.
+Gunanya bukan dokumentasi. Gunanya adalah supaya enam bulan lagi, saat ada yang bertanya "kenapa tidak pakai FIFO saja?", jawabannya sudah tertulis lengkap dengan alasan yang berlaku saat itu, dan bisa dinilai apakah alasannya masih berlaku.
 
 **ADR tidak diubah setelah diterima.** Kalau keputusannya berubah, tulis ADR baru yang menggantikannya dan tandai yang lama sebagai `Digantikan oleh ADR-XXXX`. Riwayat keputusan sama berharganya dengan keputusannya sendiri.
 

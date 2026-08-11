@@ -1,4 +1,4 @@
-# ADR-0004 — Offline hanya untuk menjual
+# ADR-0004: Offline hanya untuk menjual
 
 - **Tanggal:** 2026-08-07
 - **Status:** Diterima
@@ -13,7 +13,7 @@ Hanya **penjualan** yang berjalan offline. Menambah dan mengubah produk, menerim
 
 ## Alasan
 
-Penjualan bersifat **tambah-saja**. Tidak pernah ada dua pihak yang mengubah baris yang sama, sehingga tidak ada konflik yang perlu diputuskan mesin sinkronisasi. Yang tersisa cuma satu pertanyaan — "apakah pesan ini sudah sampai?" — dan itu punya jawaban baku: kunci idempotensi.
+Penjualan bersifat **tambah-saja**. Tidak pernah ada dua pihak yang mengubah baris yang sama, sehingga tidak ada konflik yang perlu diputuskan mesin sinkronisasi. Yang tersisa cuma satu pertanyaan, "apakah pesan ini sudah sampai?", dan itu punya jawaban baku: kunci idempotensi.
 
 Begitu perubahan katalog diizinkan offline, kita berhadapan dengan dua perangkat yang mengubah harga produk yang sama lalu harus memilih pemenang. Tidak ada pilihan yang benar di situ, hanya pilihan yang salahnya berbeda-beda. Untuk toko dengan satu kasir, kerumitan itu tidak dibayar oleh manfaat apa pun.
 
@@ -32,4 +32,4 @@ Batasan ini juga cocok dengan kenyataan kerja: mengurus katalog, menerima barang
 - Mesin sinkronisasi bisa dijelaskan dalam satu halaman ([bab 05](../perancangan/05-sinkronisasi-offline.md)).
 - Saat offline, produk baru hanya bisa ditambahkan lewat "tambah cepat" yang tersimpan lokal, dan baru menjadi produk sungguhan saat tersinkron.
 - Retur tidak bisa dilakukan offline, karena membutuhkan nota asal yang mungkin tidak ada di perangkat.
-- Bila kelak ada kasir kedua, keputusan ini tetap berlaku tanpa perubahan — dua perangkat yang sama-sama hanya menambah penjualan tetap tidak berkonflik.
+- Bila kelak ada kasir kedua, keputusan ini tetap berlaku tanpa perubahan, dua perangkat yang sama-sama hanya menambah penjualan tetap tidak berkonflik.

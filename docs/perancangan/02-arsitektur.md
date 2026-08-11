@@ -6,13 +6,13 @@
 |---|---|---|---|
 | `backend/` | Python 3.12, FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL | Seluruh aturan bisnis: stok, HPP, laba, laporan, otentikasi | Tampilan, tata letak, keadaan layar |
 | `frontend/` | React 19, TypeScript, Vite, PWA | Seluruh antarmuka; menyimpan salinan katalog dan antrean penjualan | Menghitung apa pun yang bersifat uang atau stok akhir |
-| kontrak | OpenAPI dari FastAPI → tipe TypeScript | Menjaga kedua sisi tetap sepakat | — |
+| kontrak | OpenAPI dari FastAPI → tipe TypeScript | Menjaga kedua sisi tetap sepakat | Tidak ada |
 
-Aturan yang memisahkan keduanya: **browser boleh menghitung untuk ditampilkan, server yang menghitung untuk disimpan.** Keranjang belanja boleh menjumlahkan total agar kasir melihat angkanya seketika, tapi angka yang tersimpan adalah hasil hitungan ulang di server. Kalau keduanya berbeda, itu bug — dan uji akan menangkapnya.
+Aturan yang memisahkan keduanya: **browser boleh menghitung untuk ditampilkan, server yang menghitung untuk disimpan.** Keranjang belanja boleh menjumlahkan total agar kasir melihat angkanya seketika, tapi angka yang tersimpan adalah hasil hitungan ulang di server. Kalau keduanya berbeda, itu bug, dan uji akan menangkapnya.
 
 ## 2.2 Kenapa SPA, bukan render di server
 
-Halaman yang dirender di server membutuhkan server saat dibuka. Itu persis sumber daya yang hilang ketika internet mati — sementara justru saat itulah kasir paling butuh aplikasinya terbuka.
+Halaman yang dirender di server membutuhkan server saat dibuka. Itu persis sumber daya yang hilang ketika internet mati, sementara justru saat itulah kasir paling butuh aplikasinya terbuka.
 
 Tidak ada satu pun kebutuhan di [bab 01](01-kebutuhan.md) yang memerlukan render server: tidak ada halaman publik, tidak ada kebutuhan SEO, tidak ada berbagi tautan ke luar. → [ADR-0001](../adr/0001-spa-bukan-render-server.md)
 
@@ -34,7 +34,7 @@ toko/
 │   │   │   ├── pembelian.py        penerimaan barang
 │   │   │   ├── opname.py
 │   │   │   └── laporan.py
-│   │   ├── rute/                   endpoint HTTP — tipis, tanpa logika
+│   │   ├── rute/                   endpoint HTTP, tipis, tanpa logika
 │   │   └── keamanan/               hash sandi, token, hak akses
 │   ├── migrasi/                    Alembic
 │   ├── skrip/                      perintah sekali jalan
@@ -65,7 +65,7 @@ toko/
 │   ├── rencana/                    rencana implementasi per tahap
 │   └── adr/                        catatan keputusan arsitektur
 │
-└── .github/workflows/              uji, bangun, cadangan harian
+└──.github/workflows/              uji, bangun, cadangan harian
 ```
 
 **Aturan struktur yang dijaga:**
@@ -99,11 +99,11 @@ Dua aturan yang berlaku di seluruh sistem, tanpa pengecualian:
 
 **Uang selalu bilangan bulat rupiah.** Kolom `BIGINT` di basis data, `int` di Python, `number` bulat di TypeScript. Rupiah tidak punya satuan di bawah rupiah, jadi tidak ada yang perlu disimpan sebagai pecahan.
 
-Ada **satu pengecualian**: HPP disimpan `NUMERIC(14,4)`, karena ia tarif turunan yang dikalikan faktor satuan — bukan jumlah yang dibayarkan. Alasan lengkapnya di [bab 03 §3.4](03-model-data.md#34-kenapa-hpp-boleh-berdesimal-padahal-uang-tidak).
+Ada **satu pengecualian**: HPP disimpan `NUMERIC(14,4)`, karena ia tarif turunan yang dikalikan faktor satuan, bukan jumlah yang dibayarkan. Alasan lengkapnya di [bab 03 §3.4](03-model-data.md#34-kenapa-hpp-boleh-berdesimal-padahal-uang-tidak).
 
 **Jumlah barang selalu `NUMERIC(14,3)`**, dipetakan ke `decimal.Decimal` di Python. **Tidak pernah `float`.** Alasannya bukan teori: dalam `float`, `0.1 + 0.2` menghasilkan `0.30000000000000004`. Selisih sekecil itu menumpuk lintas ribuan transaksi dan akhirnya muncul sebagai selisih stok yang tidak bisa dijelaskan siapa pun.
 
-Pembulatan hasil `harga × jumlah` memakai pembulatan ke atas untuk setengah (`ROUND_HALF_UP`) ke rupiah terdekat, dilakukan **satu kali** di tingkat baris nota — bukan berulang di tiap langkah, karena pembulatan berulang menggeser hasil.
+Pembulatan hasil `harga × jumlah` memakai pembulatan ke atas untuk setengah (`ROUND_HALF_UP`) ke rupiah terdekat, dilakukan **satu kali** di tingkat baris nota, bukan berulang di tiap langkah, karena pembulatan berulang menggeser hasil.
 
 ## 2.6 Penempatan
 
@@ -111,10 +111,10 @@ Pembulatan hasil `harga × jumlah` memakai pembulatan ke atas untuk setengah (`R
 |---|---|---|
 | Tampilan statis | Cloudflare Pages | Gratis permanen, tanpa syarat khusus |
 | API Python | Render (lapisan gratis) | Tidur setelah 15 menit menganggur, bangun ~50 detik |
-| PostgreSQL | Neon (lapisan gratis) | 0,5 GB — cukup untuk beberapa tahun transaksi toko ini |
+| PostgreSQL | Neon (lapisan gratis) | 0,5 GB, cukup untuk beberapa tahun transaksi toko ini |
 | Cadangan | GitHub Actions terjadwal | `pg_dump` harian, disimpan terenkripsi |
 
-Soal tidur-bangun Render: **antrean offline kebetulan menutupi persis masalah itu.** Transaksi pertama di pagi hari tidak menunggu server bangun — ia masuk antrean lokal dan terkirim sendiri beberapa puluh detik kemudian. Kasir tidak pernah melihat penantian itu.
+Soal tidur-bangun Render: **antrean offline kebetulan menutupi persis masalah itu.** Transaksi pertama di pagi hari tidak menunggu server bangun. Ia masuk antrean lokal dan terkirim sendiri beberapa puluh detik kemudian. Kasir tidak pernah melihat penantian itu.
 
 Perkiraan ukuran data: satu nota ± 200 byte, satu baris nota ± 150 byte. Pada 100 transaksi/hari dengan rata-rata 5 barang, setahun menghasilkan sekitar 40 MB sebelum indeks. Batas 0,5 GB memberi ruang bertahun-tahun.
 

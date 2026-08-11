@@ -13,7 +13,7 @@ Sistem ini melayani dua orang dengan kebutuhan yang bertolak belakang, dan menco
 
 Karena itu **layar kasir dioptimalkan untuk desktop dan keyboard**, sedangkan **dashboard, laporan, dan opname dioptimalkan untuk HP**.
 
-Tetapi "dioptimalkan untuk" tidak berarti "hanya jalan di". **Setiap layar wajib rapi dan bisa dioperasikan penuh dari 360 px ke atas** — tidak ada tombol yang terpotong, tidak ada tabel yang mendorong halaman melebar ke samping, tidak ada tindakan yang cuma bisa dicapai lewat papan ketik. Layar kasir di HP tetap bisa menyelesaikan transaksi; ia hanya tidak secepat di PC, dan memang tidak dirancang untuk itu.
+Tetapi "dioptimalkan untuk" tidak berarti "hanya jalan di". **Setiap layar wajib rapi dan bisa dioperasikan penuh dari 360 px ke atas**, tidak ada tombol yang terpotong, tidak ada tabel yang mendorong halaman melebar ke samping, tidak ada tindakan yang cuma bisa dicapai lewat papan ketik. Layar kasir di HP tetap bisa menyelesaikan transaksi; ia hanya tidak secepat di PC, dan memang tidak dirancang untuk itu.
 
 ## 6.2 Peta layar
 
@@ -45,7 +45,7 @@ Masuk
  │    └── Dashboard, penjualan, laba, persediaan, sesi kas
  └── Pengaturan (peran: pemilik)
       ├── Data toko, pembulatan, batas retur, cetak otomatis
-      └── Pengguna — buat akun, ubah peran, nonaktifkan, atur ulang sandi
+      └── Pengguna, buat akun, ubah peran, nonaktifkan, atur ulang sandi
 ```
 
 Satu layar tambahan berlaku untuk **semua peran**: **Ubah sandi sendiri**, dicapai dari menu akun. Kasir tidak punya hak apa pun di Pengaturan, tetapi sandinya tetap miliknya sendiri.
@@ -54,7 +54,7 @@ Satu layar tambahan berlaku untuk **semua peran**: **Ubah sandi sendiri**, dicap
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Toko Berkah   Kasir: Irvan   Sesi #12    🟢 Tersinkron       12:04  │
+│ Toko Berkah   Kasir: Irvan   Sesi #12    hijau Tersinkron       12:04  │
 ├────────────────────────────────────────────┬─────────────────────────┤
 │  Cari / pindai ▸ ______________________    │                         │
 │                                            │        TOTAL            │
@@ -74,16 +74,16 @@ Satu layar tambahan berlaku untuk **semua peran**: **Ubah sandi sendiri**, dicap
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-Bilah bawah itu **tombol sungguhan yang bisa disentuh atau diklik**, bukan sekadar keterangan. Labelnya memuat pintasannya sekaligus — sehingga kasir yang memakai mouse hari ini akan menghafal F-key-nya sendiri tanpa pernah membaca panduan.
+Bilah bawah itu **tombol sungguhan yang bisa disentuh atau diklik**, bukan sekadar keterangan. Labelnya memuat pintasannya sekaligus, sehingga kasir yang memakai mouse hari ini akan menghafal F-key-nya sendiri tanpa pernah membaca panduan.
 
 **Aturan yang menentukan bentuk layar ini:**
 
-1. **Fokus selalu kembali ke kolom cari.** Setelah barang masuk keranjang, setelah dialog ditutup, setelah transaksi selesai. Kasir tidak pernah perlu mengklik untuk melanjutkan — dan scanner barcode, yang bekerja persis seperti keyboard, langsung berfungsi tanpa penyesuaian apa pun.
+1. **Fokus selalu kembali ke kolom cari.** Setelah barang masuk keranjang, setelah dialog ditutup, setelah transaksi selesai. Kasir tidak pernah perlu mengklik untuk melanjutkan, dan scanner barcode, yang bekerja persis seperti keyboard, langsung berfungsi tanpa penyesuaian apa pun.
 2. **Total adalah benda terbesar di layar.** Angka inilah yang diucapkan kasir ke pembeli puluhan kali sehari, dan sering dibaca sambil menoleh.
 3. **Tidak ada animasi di jalur transaksi.** Transisi 200 milidetik dikali 300 transaksi sehari adalah satu menit yang hilang, ditambah rasa lambat yang tidak perlu.
 4. **Baris terakhir selalu tersorot**, sehingga F2/F3 bekerja pada baris yang benar tanpa dipilih dulu.
 5. **Bilah status tidak pernah kosong** ([bab 05](05-sinkronisasi-offline.md) §5.6).
-6. **Setiap tindakan punya dua jalan: pintasan papan ketik dan tombol layar.** Tidak ada satu pun tindakan yang hanya bisa dicapai lewat papan ketik — kalau ada, layar ini mati total di tablet.
+6. **Setiap tindakan punya dua jalan: pintasan papan ketik dan tombol layar.** Tidak ada satu pun tindakan yang hanya bisa dicapai lewat papan ketik, kalau ada, layar ini mati total di tablet.
 
 ### Tombol pintas dan syarat Fn-lock
 
@@ -98,11 +98,11 @@ Pintasannya **hanya F-key**, tanpa alternatif `Ctrl`:
 | Bayar | `F9` |
 | Batal | `Esc` |
 
-Satu set tombol saja lebih mudah dihafal, dan inilah yang lazim di mesin kasir toko lain — kasir berpengalaman langsung mengenalinya.
+Satu set tombol saja lebih mudah dihafal, dan inilah yang lazim di mesin kasir toko lain, kasir berpengalaman langsung mengenalinya.
 
-> ⚠️ **Syarat pemasangan di laptop.** Di kebanyakan laptop, baris tombol F dipakai untuk volume dan kecerahan, sehingga `F9` sebenarnya menuntut `Fn+F9` — dua tangan, ratusan kali sehari. **Laptop kasir wajib disetel Fn-lock** (lewat BIOS, atau `Fn+Esc` pada banyak merek) sebagai bagian dari pemasangan awal, dan setelan itu perlu diperiksa ulang setiap kali laptopnya diganti atau BIOS-nya direset.
+> **Syarat pemasangan di laptop.** Di kebanyakan laptop, baris tombol F dipakai untuk volume dan kecerahan, sehingga `F9` sebenarnya menuntut `Fn+F9`, dua tangan, ratusan kali sehari. **Laptop kasir wajib disetel Fn-lock** (lewat BIOS, atau `Fn+Esc` pada banyak merek) sebagai bagian dari pemasangan awal, dan setelan itu perlu diperiksa ulang setiap kali laptopnya diganti atau BIOS-nya direset.
 >
-> Ini utang yang disengaja: kenyamanan sehari-hari ditukar dengan satu langkah pemasangan yang bisa terlupa. Kalau kelak ternyata sering terlupa, tambahkan alternatif `Ctrl+huruf` — bukan mengganti F-key.
+> Ini utang yang disengaja: kenyamanan sehari-hari ditukar dengan satu langkah pemasangan yang bisa terlupa. Kalau kelak ternyata sering terlupa, tambahkan alternatif `Ctrl+huruf`, bukan mengganti F-key.
 
 Perangkat sentuh tidak terpengaruh sama sekali, karena setiap tindakan juga punya tombolnya sendiri (aturan #6).
 
@@ -124,9 +124,9 @@ Perangkat sentuh tidak terpengaruh sama sekali, karena setiap tindakan juga puny
 └──────────────────────────────────────┘
 ```
 
-Kembalian dihitung saat diketik, bukan setelah dikonfirmasi — kasir sering mengambil uang kembalian sebelum menekan tombol terakhir.
+Kembalian dihitung saat diketik, bukan setelah dikonfirmasi, kasir sering mengambil uang kembalian sebelum menekan tombol terakhir.
 
-### Setelah bayar — tanpa langkah cetak
+### Setelah bayar, tanpa langkah cetak
 
 Toko belum punya printer, jadi **cetak bukan bagian dari alur menyelesaikan transaksi.** Setelah pembayaran dikonfirmasi, layar langsung menampilkan ringkasan dengan kembalian sebagai angka terbesar:
 
@@ -143,7 +143,7 @@ Toko belum punya printer, jadi **cetak bukan bagian dari alur menyelesaikan tran
 
 `Enter` langsung membuka transaksi berikutnya. Tombol **Cetak struk** ada di sana untuk dipakai kalau printer tersedia, tetapi tidak pernah menghalangi.
 
-Ada pengaturan `cetak_otomatis` yang **mati secara bawaan**. Saat printer dibeli (M8), pemilik menyalakannya dan dialog cetak muncul sendiri setelah setiap transaksi — tanpa perlu ubah kode.
+Ada pengaturan `cetak_otomatis` yang **mati secara bawaan**. Saat printer dibeli (M8), pemilik menyalakannya dan dialog cetak muncul sendiri setelah setiap transaksi, tanpa perlu ubah kode.
 
 Nota lama selalu bisa dicetak ulang dari daftar penjualan, sehingga struk yang gagal tercetak bukan kejadian yang perlu ditakuti.
 
@@ -199,7 +199,7 @@ Bagian "Perlu perhatian" sengaja diletakkan di atas daftar terlaris. Angka penju
 └───────────────────────┘
 ```
 
-Satu produk satu blok, kolom isian besar dan langsung bisa diketik. Draf tersimpan otomatis setiap kali satu baris terisi, karena opname sering terpotong — ada pembeli datang, ada telepon masuk.
+Satu produk satu blok, kolom isian besar dan langsung bisa diketik. Draf tersimpan otomatis setiap kali satu baris terisi, karena opname sering terpotong, ada pembeli datang, ada telepon masuk.
 
 ## 6.6 Prinsip yang berlaku di semua layar
 
@@ -207,13 +207,13 @@ Satu produk satu blok, kolom isian besar dan langsung bisa diketik. Draf tersimp
 
 **Kontras.** Toko sering terang oleh cahaya matahari, dan layar kasir sering murah. Teks abu muda di atas putih tidak terbaca di sana. Warna teks utama minimal berkontras 7:1 terhadap latarnya.
 
-**Konfirmasi seperlunya.** Hanya untuk tindakan yang tidak bisa dibatalkan: memposting opname, menerima faktur pembelian, menutup sesi kas, membatalkan keranjang berisi. Dialog konfirmasi untuk hal sepele melatih orang menekan "Ya" tanpa membaca — dan itu justru merusak penjagaan yang sungguhan.
+**Konfirmasi seperlunya.** Hanya untuk tindakan yang tidak bisa dibatalkan: memposting opname, menerima faktur pembelian, menutup sesi kas, membatalkan keranjang berisi. Dialog konfirmasi untuk hal sepele melatih orang menekan "Ya" tanpa membaca, dan itu justru merusak penjagaan yang sungguhan.
 
 **Pesan kesalahan** berbahasa Indonesia, menyebut apa yang salah dan apa yang harus dilakukan, ditampilkan di samping kolom penyebabnya. Bukan "Terjadi kesalahan", melainkan "Faktor satuan harus lebih besar dari 0".
 
 **Batas lebar layar:** 360 px (HP kecil) → 768 px (tablet) → 1024 px ke atas (kasir).
 
-Setiap layar **dapat dioperasikan penuh sejak 360 px** — termasuk layar kasir. Di bawah 1024 px, susunan dua kolomnya bertumpuk: keranjang di atas, ringkasan dan tombol bayar menempel di bawah layar agar selalu terjangkau ibu jari. Yang berubah cuma tata letaknya; tidak ada tindakan yang hilang.
+Setiap layar **dapat dioperasikan penuh sejak 360 px**, termasuk layar kasir. Di bawah 1024 px, susunan dua kolomnya bertumpuk: keranjang di atas, ringkasan dan tombol bayar menempel di bawah layar agar selalu terjangkau ibu jari. Yang berubah cuma tata letaknya; tidak ada tindakan yang hilang.
 
 Batas ini diperiksa oleh uji ujung-ke-ujung pada tiga ukuran, bukan sekadar dilihat sekilas ([bab 10 §10.3](10-strategi-pengujian.md#103-tiga-lapis)).
 

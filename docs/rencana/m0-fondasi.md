@@ -125,12 +125,12 @@ Aturan yang tetap berlaku saat nanti mendaftar: **berhenti seketika bila diminta
 Keduanya memasang ke folder rumah, **tanpa `sudo`**, dan tidak menyentuh sistem:
 
 ```bash
-# uv — pemasang dependensi Python
+# uv, pemasang dependensi Python
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Node 22 lewat nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm install 22
+export NVM_DIR="$HOME/.nvm" &&. "$NVM_DIR/nvm.sh" && nvm install 22
 ```
 
 **Tidak ada Docker, tidak ada PostgreSQL sistem, tidak ada `sudo`.** PostgreSQL datang sebagai dependensi Python di Tugas 2 ([ADR-0009](../adr/0009-postgresql-tersemat-tanpa-docker.md)).
@@ -267,7 +267,7 @@ relatif terhadap tempat aplikasi dijalankan.
 
 ```bash
 # backend/.env.contoh
-# Salin menjadi .env lalu isi. Berkas .env TIDAK pernah masuk repositori.
+# Salin menjadi.env lalu isi. Berkas.env TIDAK pernah masuk repositori.
 #
 # DATABASE_URL boleh dikosongkan saat pengembangan. Bila kosong, aplikasi
 # menyalakan PostgreSQL tersemat sendiri (lihat skrip/nyalakan_basisdata.py).
@@ -304,7 +304,7 @@ Diharapkan: tercetak `DATABASE_URL=...` lalu `PostgreSQL 16.x on x86_64-pc-linux
 - [ ] **Langkah 5: Commit**
 
 ```bash
-git add backend/pyproject.toml backend/skrip backend/.env.contoh backend/app/__init__.py .gitignore
+git add backend/pyproject.toml backend/skrip backend/.env.contoh backend/app/__init__.py.gitignore
 git commit -m "chore: kerangka repositori dan PostgreSQL tersemat"
 ```
 
@@ -345,8 +345,8 @@ def ambil_pengaturan() -> Pengaturan:
 def url_basisdata() -> str:
     """URL basis data yang dipakai aplikasi.
 
-    Bila DATABASE_URL diisi, itu yang dipakai — jalur untuk penempatan.
-    Bila kosong, PostgreSQL tersemat dinyalakan — jalur untuk pengembangan.
+    Bila DATABASE_URL diisi, itu yang dipakai, jalur untuk penempatan.
+    Bila kosong, PostgreSQL tersemat dinyalakan, jalur untuk pengembangan.
     """
     if ditetapkan := ambil_pengaturan().database_url:
         return ditetapkan
@@ -392,7 +392,7 @@ def ambil_sesi() -> Iterator[Session]:
         sesi.close()
 ```
 
-**Mesin dibuat malas, bukan saat modul diimpor.** Ini penyimpangan dari rancangan awal, dan alasannya baru terlihat saat uji dijalankan: `conftest.py` mengimpor modul ini untuk mengambil `ambil_sesi`, dan pembuatan mesin di tingkat modul akan **menyalakan basis data pengembangan hanya karena sebuah impor** — padahal uji memakai basis datanya sendiri. Efek samping saat impor selalu berakhir seperti ini.
+**Mesin dibuat malas, bukan saat modul diimpor.** Ini penyimpangan dari rancangan awal, dan alasannya baru terlihat saat uji dijalankan: `conftest.py` mengimpor modul ini untuk mengambil `ambil_sesi`, dan pembuatan mesin di tingkat modul akan **menyalakan basis data pengembangan hanya karena sebuah impor**, padahal uji memakai basis datanya sendiri. Efek samping saat impor selalu berakhir seperti ini.
 
 ```python
 # app/model/dasar.py
@@ -1921,7 +1921,7 @@ git commit -m "feat: perintah pembuatan pemilik pertama"
 
 ```bash
 cd frontend
-npm create vite@latest . -- --template react-ts
+npm create vite@latest. -- --template react-ts
 npm install
 npm install -D tailwindcss @tailwindcss/postcss postcss autoprefixer vitest jsdom @testing-library/react
 npx tailwindcss init
@@ -1970,7 +1970,7 @@ export async function minta<T>(jalur: string, opsi: OpsiMinta = {}): Promise<T> 
     method: opsi.metode ?? "GET",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: opsi.muatan === undefined ? undefined : JSON.stringify(opsi.muatan),
   });
@@ -2029,7 +2029,7 @@ describe("klien api", () => {
       ),
     ));
     await expect(minta("/auth/masuk", { metode: "POST", muatan: {} }))
-      .rejects.toMatchObject({ kode: "KREDENSIAL_SALAH", status: 401 });
+.rejects.toMatchObject({ kode: "KREDENSIAL_SALAH", status: 401 });
   });
 
   it("menampilkan pesan server apa adanya", async () => {
@@ -2093,7 +2093,7 @@ if __name__ == "__main__":
 ```json
 {
   "scripts": {
-    "tipe": "cd ../backend && uv run python -m skrip.ekspor_openapi && cd ../frontend && npx openapi-typescript ../backend/openapi.json -o src/api/tipe.ts"
+    "tipe": "cd../backend && uv run python -m skrip.ekspor_openapi && cd../frontend && npx openapi-typescript../backend/openapi.json -o src/api/tipe.ts"
   }
 }
 ```
@@ -2383,8 +2383,8 @@ describe("LayarPengguna", () => {
 
   it("menampilkan pesan server saat menonaktifkan pemilik terakhir", async () => {
     const tiruan = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify(DAFTAR), { status: 200 }))
-      .mockResolvedValueOnce(new Response(
+.mockResolvedValueOnce(new Response(JSON.stringify(DAFTAR), { status: 200 }))
+.mockResolvedValueOnce(new Response(
         JSON.stringify({
           kode: "PEMILIK_TERAKHIR",
           pesan: "Tindakan ini menyisakan nol akun pemilik aktif. Tunjuk pemilik lain lebih dulu.",
@@ -2456,7 +2456,7 @@ fi
 echo "OK: tidak ada perubahan aturan bisnis yang tanpa uji."
 ```
 
-Jadikan bisa dijalankan: `chmod +x .github/skrip/periksa_uji.sh`
+Jadikan bisa dijalankan: `chmod +x.github/skrip/periksa_uji.sh`
 
 - [ ] **Langkah 2: Tulis `.github/workflows/uji.yml`**
 
@@ -2478,11 +2478,11 @@ jobs:
       - run: uv python install 3.12
       - name: Gerbang uji
         if: github.event_name == 'pull_request'
-        run: ./.github/skrip/periksa_uji.sh origin/${{ github.base_ref }}
+        run:./.github/skrip/periksa_uji.sh origin/${{ github.base_ref }}
       - working-directory: backend
         run: |
           uv sync --all-groups
-          uv run ruff check .
+          uv run ruff check.
           uv run mypy app
           uv run pytest -v
           uv run pip-audit
@@ -2519,7 +2519,7 @@ Lalu batalkan: `git reset --hard HEAD~1`
 - [ ] **Langkah 4: Commit**
 
 ```bash
-git add .github
+git add.github
 git commit -m "ci: alur uji dan gerbang perubahan aturan bisnis"
 ```
 
@@ -2537,7 +2537,7 @@ cd backend && uv run python -m skrip.nyalakan_basisdata
 uv run alembic upgrade head
 uv run python -m app.perintah.buat_pemilik irvan "Irvan" rahasia123
 uv run uvicorn app.main:app --reload &
-cd ../frontend && npm run dev
+cd../frontend && npm run dev
 ```
 
 - [ ] **Langkah 2: Telusuri alur pemilik**
@@ -2558,8 +2558,8 @@ Langkah 3 penting: ia membuktikan penjagaan ada di server, bukan sekadar menu ya
 - [ ] **Langkah 4: Jalankan seluruh uji dan pemeriksa**
 
 ```bash
-cd backend && uv run ruff check . && uv run mypy app && uv run pytest -v
-cd ../frontend && npx tsc --noEmit && npx vitest run
+cd backend && uv run ruff check. && uv run mypy app && uv run pytest -v
+cd../frontend && npx tsc --noEmit && npx vitest run
 ```
 
 Diharapkan: seluruhnya lulus, tanpa peringatan tipe.
@@ -2577,7 +2577,7 @@ git commit -m "chore: M0 selesai, terverifikasi dari ujung ke ujung di localhost
 
 ## Tugas Tertunda: Penempatan ke lapisan gratis
 
-> **Ditunda atas keputusan pemilik proyek (2026-08-08).** M0 dinyatakan selesai tanpa tugas ini. Kerjakan ketika kebutuhan "pemilik memantau dari HP di mana saja" mulai mendesak — paling lambat sebelum M3, karena semakin banyak bagian yang sudah jadi, semakin sulit mencari tahu penyebab kegagalan penempatan.
+> **Ditunda atas keputusan pemilik proyek (2026-08-08).** M0 dinyatakan selesai tanpa tugas ini. Kerjakan ketika kebutuhan "pemilik memantau dari HP di mana saja" mulai mendesak, paling lambat sebelum M3, karena semakin banyak bagian yang sudah jadi, semakin sulit mencari tahu penyebab kegagalan penempatan.
 
 **Prasyarat:** daftar akun Neon dan Render lebih dulu, dengan aturan **berhenti seketika bila diminta data pembayaran** (G1). Catat hasilnya di `docs/rencana/catatan-penempatan.md`: nama layanan, tanggal diperiksa, apakah meminta kartu, dan batas kuota gratis yang tertulis.
 
@@ -2592,10 +2592,10 @@ FROM python:3.12-slim
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock./
 RUN uv sync --frozen --no-dev
 
-COPY . .
+COPY..
 
 CMD ["sh", "-c", "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 ```

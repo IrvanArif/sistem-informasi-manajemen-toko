@@ -1,13 +1,13 @@
-# ADR-0007 — Lapisan gratis, dijaga tetap bisa dipindah
+# ADR-0007: Lapisan gratis, dijaga tetap bisa dipindah
 
 - **Tanggal:** 2026-08-07
 - **Status:** Diterima. Bagian "semua layanan dijalankan lewat `docker-compose.yml`" diubah oleh [ADR-0009](0009-postgresql-tersemat-tanpa-docker.md); sisanya tetap berlaku.
 
 ## Konteks
 
-Pemilik proyek menetapkan seluruh perkakas harus gratis atau open source, tanpa biaya berlangganan. Sementara itu, sistem harus bisa dibuka dari luar toko lewat internet — yang berarti ada komputer yang menyala terus di suatu tempat.
+Pemilik proyek menetapkan seluruh perkakas harus gratis atau open source, tanpa biaya berlangganan. Sementara itu, sistem harus bisa dibuka dari luar toko lewat internet, yang berarti ada komputer yang menyala terus di suatu tempat.
 
-Seluruh **perangkat lunaknya** memang sudah gratis: Python, FastAPI, SQLAlchemy, PostgreSQL, React, Vite, Tailwind — semuanya berlisensi MIT, Apache, ISC, PSF, atau PostgreSQL License. Yang berbiaya hanyalah tempat menjalankannya.
+Seluruh **perangkat lunaknya** memang sudah gratis: Python, FastAPI, SQLAlchemy, PostgreSQL, React, Vite, Tailwind, semuanya berlisensi MIT, Apache, ISC, PSF, atau PostgreSQL License. Yang berbiaya hanyalah tempat menjalankannya.
 
 ## Keputusan
 
@@ -15,12 +15,12 @@ Memakai gabungan lapisan gratis:
 
 | Lapisan | Layanan | Batasan yang diterima |
 |---|---|---|
-| Tampilan statis | Cloudflare Pages | — |
+| Tampilan statis | Cloudflare Pages | Tidak ada |
 | API Python | Render (gratis) | Tidur setelah 15 menit menganggur, bangun ~50 detik |
 | PostgreSQL | Neon (gratis) | 0,5 GB penyimpanan |
 | Cadangan | GitHub Actions | 90 hari masa simpan artefak |
 
-Dan **menjaga agar seluruhnya bisa dipindah**: semua layanan dijalankan lewat `docker-compose.yml` yang sama seperti di komputer pengembangan. Tidak ada fungsi khusus penyedia yang dipakai — tanpa fungsi tanpa-server milik vendor, tanpa penyimpanan berkas berpemilik, tanpa otentikasi bawaan penyedia.
+Dan **menjaga agar seluruhnya bisa dipindah**: semua layanan dijalankan lewat `docker-compose.yml` yang sama seperti di komputer pengembangan. Tidak ada fungsi khusus penyedia yang dipakai, tanpa fungsi tanpa-server milik vendor, tanpa penyimpanan berkas berpemilik, tanpa otentikasi bawaan penyedia.
 
 ## Alasan
 
@@ -41,4 +41,4 @@ Kapasitas 0,5 GB memberi ruang bertahun-tahun: dengan 100 transaksi sehari beris
 - **Aturan lapisan gratis bisa berubah sewaktu-waktu.** Ini risiko usaha yang nyata, bukan sekadar catatan teknis. Peredamnya adalah pencadangan harian ke tempat yang berbeda dari basis datanya, dan penempatan yang bisa dipindah.
 - Otentikasi tidak bisa memakai cookie `httpOnly`, karena tampilan dan API berada di domain berbeda. Alasan dan peredamnya di [bab 08 §8.2](../perancangan/08-keamanan-dan-peran.md).
 - Tidak boleh ada ketergantungan pada fungsi khusus penyedia. Setiap godaan ke arah itu harus ditolak, meski memangkas pekerjaan hari ini.
-- Bila toko tumbuh, pindah ke VPS berbayar cukup mengganti berkas konfigurasi — bukan menulis ulang.
+- Bila toko tumbuh, pindah ke VPS berbayar cukup mengganti berkas konfigurasi, bukan menulis ulang.

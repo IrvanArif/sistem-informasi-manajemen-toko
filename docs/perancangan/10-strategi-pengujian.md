@@ -17,13 +17,13 @@ Tampilan diuji paling sedikit. Tombol yang salah warna ketahuan dalam sekejap; H
 
 ## 10.2 Uji ditulis menyusul, tetapi wajib ada sebelum digabung
 
-Kode ditulis lebih dulu, ujinya menyusul **di dalam tugas yang sama** — bukan ditunda ke "nanti kalau sempat". Gerbangnya bukan urutan penulisan, melainkan penggabungan: [alur CI](#105-otomasi) menolak cabang yang menyentuh `backend/app/layanan/` tanpa membawa uji.
+Kode ditulis lebih dulu, ujinya menyusul **di dalam tugas yang sama**, bukan ditunda ke "nanti kalau sempat". Gerbangnya bukan urutan penulisan, melainkan penggabungan: [alur CI](#105-otomasi) menolak cabang yang menyentuh `backend/app/layanan/` tanpa membawa uji.
 
-Keputusan ini diambil sadar. Menulis uji lebih dulu memang menghasilkan rancangan yang lebih bersih, tetapi menuntut penguasaan `pytest` sejak hari pertama — sementara proyek ini sekaligus menjadi tempat belajar Python. Disiplin yang ditulis di dokumen lalu ditinggalkan di minggu kedua lebih buruk daripada disiplin yang lebih rendah tapi benar-benar dijalankan.
+Keputusan ini diambil sadar. Menulis uji lebih dulu memang menghasilkan rancangan yang lebih bersih, tetapi menuntut penguasaan `pytest` sejak hari pertama, sementara proyek ini sekaligus menjadi tempat belajar Python. Disiplin yang ditulis di dokumen lalu ditinggalkan di minggu kedua lebih buruk daripada disiplin yang lebih rendah tapi benar-benar dijalankan.
 
 **Risiko yang diterima:** uji yang ditulis setelah kodenya cenderung memeriksa apa yang kebetulan sudah dikerjakan kode, bukan apa yang seharusnya dikerjakan. Kalau rumus HPP salah, uji yang ditulis dari kode itu akan meloloskannya dengan yakin.
 
-**Peredamnya sudah tersedia, dan justru inilah gunanya menulis rancangan sebelum kode.** Contoh terhitung di [bab 03 §3.5](03-model-data.md#35-contoh-terhitung) — HPP `2.866,6667`, laba `Rp17.233`, beras `1,5 kg` senilai `Rp21.000` — ditulis **sebelum satu baris kode pun ada**. Angka-angka itu berasal dari rancangan, bukan dari keluaran program. Untuk bagian yang paling mahal kalau salah, jawabannya sudah dipatok lebih dulu, jadi urutan penulisan uji tidak lagi menentukan.
+**Peredamnya sudah tersedia, dan justru inilah gunanya menulis rancangan sebelum kode.** Contoh terhitung di [bab 03 §3.5](03-model-data.md#35-contoh-terhitung), HPP `2.866,6667`, laba `Rp17.233`, beras `1,5 kg` senilai `Rp21.000`, ditulis **sebelum satu baris kode pun ada**. Angka-angka itu berasal dari rancangan, bukan dari keluaran program. Untuk bagian yang paling mahal kalau salah, jawabannya sudah dipatok lebih dulu, jadi urutan penulisan uji tidak lagi menentukan.
 
 Karena itu aturannya: **untuk perhitungan uang dan stok, uji wajib memakai angka dari [bab 03 §3.5](03-model-data.md#35-contoh-terhitung), bukan angka yang disalin dari hasil menjalankan kode.** Kalau kode dan dokumen berbeda, yang salah adalah kodenya sampai terbukti sebaliknya.
 
@@ -32,15 +32,15 @@ Setiap uji dirujuk ke kode kebutuhannya (`KAS-04`, `BEL-04`, `AKS-05`, …) sehi
 ## 10.3 Tiga lapis
 
 ```
-        ╱ E2E ╲          sedikit — alur utuh, termasuk simulasi offline
+        ╱ E2E ╲          sedikit, alur utuh, termasuk simulasi offline
       ╱─────────╲
-    ╱ Integrasi  ╲       sedang — API + basis data sungguhan
+    ╱ Integrasi  ╲       sedang, API + basis data sungguhan
   ╱───────────────╲
-╱  Unit (layanan)  ╲     banyak — aturan bisnis murni, tanpa I/O
+╱  Unit (layanan)  ╲     banyak, aturan bisnis murni, tanpa I/O
 ────────────────────
 ```
 
-### Unit — `pytest`
+### Unit, `pytest`
 
 Menguji isi `backend/app/layanan/` tanpa menyalakan server. Fungsi di sana menerima objek biasa dan sesi basis data, sehingga cepat dan tidak rapuh.
 
@@ -59,7 +59,7 @@ Kasus wajib:
 
 **Contoh terhitung di [bab 03 §3.5](03-model-data.md#35-contoh-terhitung) diterjemahkan langsung menjadi uji.** Angka-angka itu memang ditulis untuk keperluan ini.
 
-### Uji properti — `Hypothesis`
+### Uji properti, `Hypothesis`
 
 Untuk konversi satuan dan pembulatan, contoh yang dipilih manusia cenderung terlalu rapi. Hypothesis membangkitkan ribuan kombinasi acak untuk memeriksa sifat yang harus selalu benar:
 
@@ -68,11 +68,11 @@ Untuk konversi satuan dan pembulatan, contoh yang dipilih manusia cenderung terl
 - Setelah rangkaian mutasi apa pun, salinan stok = jumlah seluruh mutasi
 - HPP tidak pernah negatif selama harga beli tidak negatif
 
-### Integrasi — `pytest` + PostgreSQL sungguhan
+### Integrasi, `pytest` + PostgreSQL sungguhan
 
 Memakai PostgreSQL 16 asli lewat `pgserver`, bukan SQLite. Perbedaan perilaku `NUMERIC`, `SELECT … FOR UPDATE`, dan `ENUM` antara keduanya persis berada di bagian yang paling ingin kita percayai.
 
-`pgserver` menjalankan PostgreSQL dari dalam lingkungan Python proyek, tanpa Docker dan tanpa pemasangan ke sistem ([ADR-0009](../adr/0009-postgresql-tersemat-tanpa-docker.md)). Karena alur CI memakai cara yang persis sama, lingkungan uji di komputer dan di CI benar-benar identik — bukan sekadar mirip.
+`pgserver` menjalankan PostgreSQL dari dalam lingkungan Python proyek, tanpa Docker dan tanpa pemasangan ke sistem ([ADR-0009](../adr/0009-postgresql-tersemat-tanpa-docker.md)). Karena alur CI memakai cara yang persis sama, lingkungan uji di komputer dan di CI benar-benar identik, bukan sekadar mirip.
 
 Kasus wajib:
 
@@ -88,14 +88,14 @@ Kasus wajib:
 - Penerimaan faktur gagal di tengah → seluruhnya dibatalkan, stok tidak berubah
 - `GET /sinkron/katalog?sejak=` hanya mengembalikan yang berubah
 
-### E2E — `Playwright`
+### E2E, `Playwright`
 
 Sedikit tapi menyeluruh, mengikuti alur di [bab 04](04-alur-kerja.md):
 
 1. **Satu hari kasir:** buka sesi → 3 transaksi (termasuk barang curah dan penjualan per dus) → tutup sesi dengan selisih → wajib isi catatan.
 2. **Transaksi tanpa mouse (KAS-13):** seluruh alur diselesaikan hanya dengan papan ketik, memakai pintasan F-key.
-3. **Transaksi tanpa papan ketik (KAS-15, NF-07):** alur yang sama diselesaikan hanya dengan sentuhan, pada `viewport` 360×640, 768×1024, dan 1280×800 — memastikan tidak ada tindakan yang cuma bisa dicapai lewat pintasan, tidak ada tombol yang terpotong, dan halaman tidak pernah bergeser ke samping.
-4. **Offline penuh:** `context.set_offline(True)` → jual 3 barang → pastikan indikator 🔴 dan transaksi tetap selesai tanpa menuntut cetak → kembalikan koneksi → pastikan ketiganya sampai, tanpa duplikat, dan stok server berkurang tepat.
+3. **Transaksi tanpa papan ketik (KAS-15, NF-07):** alur yang sama diselesaikan hanya dengan sentuhan, pada `viewport` 360×640, 768×1024, dan 1280×800, memastikan tidak ada tindakan yang cuma bisa dicapai lewat pintasan, tidak ada tombol yang terpotong, dan halaman tidak pernah bergeser ke samping.
+4. **Offline penuh:** `context.set_offline(True)` → jual 3 barang → pastikan indikator merah dan transaksi tetap selesai tanpa menuntut cetak → kembalikan koneksi → pastikan ketiganya sampai, tanpa duplikat, dan stok server berkurang tepat.
 5. **Kirim ulang setelah jaringan putus di tengah:** paksa kegagalan setelah server menyimpan → pastikan pengiriman ulang tidak menggandakan.
 6. **Tambah cepat saat offline (STK-05):** tambahkan satu barang kilat saat offline → jual di dua nota berbeda → sinkron → pastikan hanya **satu** produk tercipta dan terpakai di keduanya.
 7. **Impor CSV** dengan beberapa baris rusak → pastikan pesan menyebut nomor baris yang benar.

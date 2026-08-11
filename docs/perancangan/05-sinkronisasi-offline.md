@@ -4,9 +4,9 @@
 
 **Yang boleh berjalan offline hanya menjual.** Mengelola katalog, menerima barang, melakukan retur, dan membuka laporan tetap menuntut internet.
 
-Ada satu pengecualian sempit: **"tambah cepat" saat transaksi** (STK-05). Produk yang lahir dari situ ikut menumpang di dalam nota, dibedakan lewat `uuid_klien` miliknya sendiri, dan baru dibuat di server saat nota itu diterima. Pengecualian ini diizinkan justru karena ia bagian dari penjualan — kasir tidak sedang mengelola katalog, ia sedang melayani pembeli yang memegang barang tak dikenal.
+Ada satu pengecualian sempit: **"tambah cepat" saat transaksi** (STK-05). Produk yang lahir dari situ ikut menumpang di dalam nota, dibedakan lewat `uuid_klien` miliknya sendiri, dan baru dibuat di server saat nota itu diterima. Pengecualian ini diizinkan justru karena ia bagian dari penjualan, kasir tidak sedang mengelola katalog, ia sedang melayani pembeli yang memegang barang tak dikenal.
 
-Batasan ini menghapus seluruh kategori masalah sekaligus. Penjualan bersifat **tambah-saja**: tidak pernah ada dua pihak yang mengubah baris yang sama, sehingga tidak ada konflik yang perlu diputuskan mesin. Yang tersisa cuma satu pertanyaan teknis — "apakah pesan ini sudah sampai?" — dan itu punya jawaban baku.
+Batasan ini menghapus seluruh kategori masalah sekaligus. Penjualan bersifat **tambah-saja**: tidak pernah ada dua pihak yang mengubah baris yang sama, sehingga tidak ada konflik yang perlu diputuskan mesin. Yang tersisa cuma satu pertanyaan teknis, "apakah pesan ini sudah sampai?", dan itu punya jawaban baku.
 
 Kalau perubahan katalog juga diizinkan offline, kita akan berhadapan dengan dua perangkat yang mengubah harga produk yang sama, lalu harus memilih pemenang. Tidak ada pilihan yang benar di situ, hanya pilihan yang salahnya berbeda-beda. → [ADR-0004](../adr/0004-offline-hanya-untuk-menjual.md)
 
@@ -44,7 +44,7 @@ Kalau perubahan katalog juga diizinkan offline, kita akan berhadapan dengan dua 
 
 `stok_perkiraan` adalah tebakan untuk ditampilkan saja. Stok yang sah dihitung server. Namanya sengaja mengandung kata "perkiraan" supaya tidak ada yang keliru memakainya sebagai kebenaran.
 
-Produk hasil "tambah cepat" saat offline juga tinggal di tabel `produk` lokal, dengan `id` kosong dan `uuid_klien` terisi — sehingga ia langsung muncul di pencarian kasir untuk pembeli berikutnya, sebelum server tahu keberadaannya. Saat sinkron, `id` dari server mengisi baris yang sama.
+Produk hasil "tambah cepat" saat offline juga tinggal di tabel `produk` lokal, dengan `id` kosong dan `uuid_klien` terisi, sehingga ia langsung muncul di pencarian kasir untuk pembeli berikutnya, sebelum server tahu keberadaannya. Saat sinkron, `id` dari server mengisi baris yang sama.
 
 ## 5.4 Katalog turun
 
@@ -56,7 +56,7 @@ Server mengembalikan hanya baris dengan `diubah_pada > sejak`, dibatasi per hala
 
 **Penandanya adalah waktu server, bukan waktu perangkat.** Jam komputer toko bisa meleset berhari-hari, dan penanda yang salah akan membuat perubahan katalog terlewat diam-diam.
 
-Karena sistem ini tidak pernah menghapus data — produk dinonaktifkan lewat `aktif = false` ([bab 03 §3.3](03-model-data.md#33-aturan-integritas) aturan integritas #6) — tidak ada daftar penghapusan yang perlu disinkronkan. Penonaktifan sampai sebagai perubahan biasa.
+Karena sistem ini tidak pernah menghapus data, produk dinonaktifkan lewat `aktif = false` ([bab 03 §3.3](03-model-data.md#33-aturan-integritas) aturan integritas #6), tidak ada daftar penghapusan yang perlu disinkronkan. Penonaktifan sampai sebagai perubahan biasa.
 
 Sinkron katalog dijalankan saat aplikasi dibuka, setiap 15 menit selama online, dan setiap kali koneksi pulih.
 
@@ -71,7 +71,7 @@ Sinkron katalog dijalankan saat aplikasi dibuka, setiap 15 menit selama online, 
 4. usahakan kirim ke server      ──► boleh gagal, tidak apa-apa
 ```
 
-Urutannya tidak boleh dibalik. Kalau pengiriman didahulukan, transaksi bisa lenyap saat jaringan putus tepat di tengah — dan uang sudah berpindah tangan.
+Urutannya tidak boleh dibalik. Kalau pengiriman didahulukan, transaksi bisa lenyap saat jaringan putus tepat di tengah, dan uang sudah berpindah tangan.
 
 ### Pengiriman
 
@@ -86,7 +86,7 @@ Jeda antar percobaan menaik: **5 detik → 15 detik → 1 menit → 5 menit → 
 - **Belum ada** → simpan, potong stok, jawab `201`.
 - **Sudah ada** → jawab `200` berikut data yang tersimpan sebelumnya. Tidak ada yang dipotong dua kali.
 
-Inilah yang membuat pengiriman ulang selalu aman. Kalau jaringan putus tepat setelah server menyimpan tetapi sebelum jawabannya sampai, perangkat akan mengirim ulang — dan server cukup menjawab "sudah ada, ini datanya". **Tanpa ini, satu gangguan jaringan bisa menggandakan omzet.**
+Inilah yang membuat pengiriman ulang selalu aman. Kalau jaringan putus tepat setelah server menyimpan tetapi sebelum jawabannya sampai, perangkat akan mengirim ulang, dan server cukup menjawab "sudah ada, ini datanya". **Tanpa ini, satu gangguan jaringan bisa menggandakan omzet.**
 
 ### Harga yang dikirim perangkat
 
@@ -101,7 +101,7 @@ Baris nota boleh merujuk produk lewat `produk_id` (produk yang sudah ada di sali
 1. Untuk tiap `produk_baru`, cari produk ber-`uuid_klien` sama. Bila ada, pakai itu. Bila belum, buat produk `perlu_dilengkapi` beserta satuan dasarnya.
 2. Baru kemudian baris nota disimpan dan stok dipotong.
 
-Karena pencariannya memakai `uuid_klien` yang sama, satu barang yang ditambahkan kilat sekali lalu terjual di lima nota berbeda tetap menghasilkan **satu** produk — bukan lima produk kembar yang harus digabungkan manual belakangan.
+Karena pencariannya memakai `uuid_klien` yang sama, satu barang yang ditambahkan kilat sekali lalu terjual di lima nota berbeda tetap menghasilkan **satu** produk, bukan lima produk kembar yang harus digabungkan manual belakangan.
 
 ### Penentuan HPP untuk nota offline
 
@@ -111,7 +111,7 @@ Ini penting untuk nota yang baru sampai berjam-jam kemudian: bila di sela itu ad
 
 ### Jam perangkat meleset
 
-Setiap sinkron berhasil, perangkat membandingkan jamnya dengan waktu server dan menyimpan selisihnya. Bila selisih melebihi 5 menit, muncul peringatan — jam yang meleset merusak `waktu_transaksi`, dan itu merusak setiap laporan yang memakainya.
+Setiap sinkron berhasil, perangkat membandingkan jamnya dengan waktu server dan menyimpan selisihnya. Bila selisih melebihi 5 menit, muncul peringatan, jam yang meleset merusak `waktu_transaksi`, dan itu merusak setiap laporan yang memakainya.
 
 ## 5.6 Status yang selalu terlihat
 
@@ -119,10 +119,10 @@ Bilah status di layar kasir tidak pernah kosong:
 
 | Tampilan | Arti |
 |---|---|
-| 🟢 **Tersinkron** | Antrean kosong, katalog mutakhir |
-| 🟡 **3 transaksi menunggu** | Ada antrean, pengiriman sedang diusahakan |
-| 🔴 **Offline** | Tidak ada koneksi; penjualan tetap bisa dilakukan |
-| ⚠️ **1 transaksi gagal** | Ada yang ditolak server dan butuh tindakan manusia |
+| **Hijau**, tersinkron | Antrean kosong, katalog mutakhir |
+| **Kuning**, 3 transaksi menunggu** | Ada antrean, pengiriman sedang diusahakan |
+| **Merah**, Offline** | Tidak ada koneksi; penjualan tetap bisa dilakukan |
+| **1 transaksi gagal** | Ada yang ditolak server dan butuh tindakan manusia |
 
 Kasir tidak boleh perlu menebak apakah pekerjaannya tersimpan.
 
@@ -130,13 +130,13 @@ Kasir tidak boleh perlu menebak apakah pekerjaannya tersimpan.
 
 | Skenario | Yang terjadi | Tanggapan sistem |
 |---|---|---|
-| Internet putus saat menyimpan | Nota tetap masuk antrean, struk tercetak | Indikator 🔴, penjualan lanjut |
-| Putus setelah server simpan, sebelum jawaban tiba | Perangkat mengira gagal, mengirim ulang | Server mengenali `uuid_klien`, jawab `200` — tanpa duplikat |
+| Internet putus saat menyimpan | Nota tetap masuk antrean, struk tercetak | Indikator merah, penjualan lanjut |
+| Putus setelah server simpan, sebelum jawaban tiba | Perangkat mengira gagal, mengirim ulang | Server mengenali `uuid_klien`, jawab `200`, tanpa duplikat |
 | Server 5xx | Kegagalan sementara | Coba lagi dengan jeda menaik |
-| Server 4xx (data tidak sah) | Kegagalan permanen | Tandai ⚠️, hentikan percobaan, tampilkan alasan dan muatannya |
+| Server 4xx (data tidak sah) | Kegagalan permanen | Tandai, hentikan percobaan, tampilkan alasan dan muatannya |
 | Token kedaluwarsa (401) | Sesi habis | Minta masuk ulang, lalu antrean dilanjutkan otomatis |
 | Antrean menumpuk (>50 atau tertua >24 jam) | Ada yang tidak beres | Peringatan mencolok, tetapi **penjualan tidak pernah dihalangi** |
-| Data browser dibersihkan | Antrean hilang | Tidak bisa dipulihkan — lihat §5.8 |
+| Data browser dibersihkan | Antrean hilang | Tidak bisa dipulihkan, lihat §5.8 |
 | Katalog belum pernah tersinkron | Perangkat baru, belum siap | Layar kasir tidak bisa dibuka sebelum sinkron pertama |
 | Tutup sesi kas saat antrean belum kosong | Kas sistem belum lengkap | Penutupan ditolak sampai antrean bersih |
 
@@ -144,7 +144,7 @@ Perhatikan pola yang berulang: **tidak ada kegagalan yang berujung pada "kasir t
 
 ## 5.8 Batas yang diakui terus terang
 
-Kalau data browser dibersihkan — pengguna membersihkan riwayat, browser dipasang ulang, browser menyingkirkan data karena ruang penyimpanan menipis — **penjualan yang masih menunggu akan hilang.**
+Kalau data browser dibersihkan, pengguna membersihkan riwayat, browser dipasang ulang, browser menyingkirkan data karena ruang penyimpanan menipis, **penjualan yang masih menunggu akan hilang.**
 
 Peredamnya berlapis:
 
@@ -153,6 +153,6 @@ Peredamnya berlapis:
 3. Aplikasi dipasang sebagai PWA, sehingga tidak ikut terhapus saat riwayat browser dibersihkan.
 4. Struk cetak tetap menjadi bukti fisik yang bisa dimasukkan ulang secara manual.
 
-Tapi peredam bukan jaminan. Ini harga yang dibayar untuk bisa berjualan tanpa internet, dan harga itu sepadan — kehilangan beberapa transaksi karena kejadian langka masih jauh lebih murah daripada berhenti berjualan setiap kali internet terganggu.
+Tapi peredam bukan jaminan. Ini harga yang dibayar untuk bisa berjualan tanpa internet, dan harga itu sepadan, kehilangan beberapa transaksi karena kejadian langka masih jauh lebih murah daripada berhenti berjualan setiap kali internet terganggu.
 
-Kalau di kemudian hari risiko ini terasa terlalu besar, jalan keluarnya bukan menambal tambalan, melainkan pindah ke arsitektur lain — server di komputer toko, yang alternatifnya sudah dibahas di [ADR-0001](../adr/0001-spa-bukan-render-server.md).
+Kalau di kemudian hari risiko ini terasa terlalu besar, jalan keluarnya bukan menambal tambalan, melainkan pindah ke arsitektur lain, server di komputer toko, yang alternatifnya sudah dibahas di [ADR-0001](../adr/0001-spa-bukan-render-server.md).

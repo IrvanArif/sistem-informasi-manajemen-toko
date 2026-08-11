@@ -1,6 +1,6 @@
 # 07. Kontrak API
 
-Daftar ini adalah rancangan, bukan dokumentasi. Dokumentasi yang sesungguhnya dibangkitkan FastAPI dari model Pydantic dan tersedia di `/docs` — kalau keduanya berbeda, **yang benar adalah yang dibangkitkan**, dan bab ini yang harus diperbarui.
+Daftar ini adalah rancangan, bukan dokumentasi. Dokumentasi yang sesungguhnya dibangkitkan FastAPI dari model Pydantic dan tersedia di `/docs`, kalau keduanya berbeda, **yang benar adalah yang dibangkitkan**, dan bab ini yang harus diperbarui.
 
 ## 7.1 Ketentuan umum
 
@@ -26,7 +26,7 @@ Daftar ini adalah rancangan, bukan dokumentasi. Dokumentasi yang sesungguhnya di
 }
 ```
 
-`kode` untuk program, `pesan` untuk manusia dan **sudah berbahasa Indonesia** — antarmuka menampilkannya apa adanya, tidak menerjemahkan ulang.
+`kode` untuk program, `pesan` untuk manusia dan **sudah berbahasa Indonesia**, antarmuka menampilkannya apa adanya, tidak menerjemahkan ulang.
 
 ## 7.2 Otentikasi
 
@@ -36,9 +36,9 @@ Daftar ini adalah rancangan, bukan dokumentasi. Dokumentasi yang sesungguhnya di
 | POST | `/auth/segarkan` | `{token_segar}` → token akses baru |
 | POST | `/auth/keluar` | Mencabut token segar |
 | GET | `/auth/saya` | Data pengguna berjalan berikut perannya |
-| POST | `/auth/ubah-sandi` | `{sandi_lama, sandi_baru}` — untuk diri sendiri (AKS-04) |
+| POST | `/auth/ubah-sandi` | `{sandi_lama, sandi_baru}`, untuk diri sendiri (AKS-04) |
 
-### Pengelolaan pengguna — hanya peran `pemilik`
+### Pengelolaan pengguna, hanya peran `pemilik`
 
 | Metode | Jalur | Guna |
 |---|---|---|
@@ -73,7 +73,7 @@ Jawaban:
 
 `waktu_server` disimpan perangkat sebagai penanda `sejak` berikutnya. Perangkat tidak pernah memakai jamnya sendiri untuk ini ([bab 05](05-sinkronisasi-offline.md) §5.4).
 
-> **Endpoint ini menyaring `hpp` berdasarkan peran, sama seperti `/produk`.** Untuk pengguna berperan `kasir`, kolom `hpp` **tidak pernah ikut terkirim** — bukan dikirim lalu disembunyikan. Ini endpoint yang paling sering dipanggil perangkat kasir, jadi kelalaian di sini membocorkan harga modal lewat pintu yang paling ramai. Diperiksa oleh uji integrasi di [bab 10 §10.3](10-strategi-pengujian.md#103-tiga-lapis).
+> **Endpoint ini menyaring `hpp` berdasarkan peran, sama seperti `/produk`.** Untuk pengguna berperan `kasir`, kolom `hpp` **tidak pernah ikut terkirim**, bukan dikirim lalu disembunyikan. Ini endpoint yang paling sering dipanggil perangkat kasir, jadi kelalaian di sini membocorkan harga modal lewat pintu yang paling ramai. Diperiksa oleh uji integrasi di [bab 10 §10.3](10-strategi-pengujian.md#103-tiga-lapis).
 
 ## 7.4 Katalog
 
@@ -83,7 +83,7 @@ Jawaban:
 | POST | `/produk` | Produk baru berikut satuan dasarnya |
 | GET | `/produk/{id}` | Satu produk berikut seluruh satuannya |
 | PATCH | `/produk/{id}` | Ubah produk |
-| POST | `/produk/kilat` | Tambah cepat saat transaksi (STK-05) — `{nama, harga}` |
+| POST | `/produk/kilat` | Tambah cepat saat transaksi (STK-05), `{nama, harga}` |
 | POST | `/produk/{id}/satuan` | Tambah satuan |
 | PATCH | `/satuan/{id}` | Ubah satuan; menonaktifkan lewat `{aktif: false}` |
 | POST | `/produk/impor/pratinjau` | Unggah CSV → laporan baris sah & gagal, **tanpa menyimpan apa pun** |
@@ -105,25 +105,25 @@ Pratinjau impor mengembalikan kegagalan per baris dengan nomor barisnya:
 
 **Impor tidak menyimpan keadaan sementara di server.** Pratinjau memeriksa lalu melupakan; saat pemilik menekan "Jalankan", perangkat mengirim berkas yang sama sekali lagi dan server memeriksanya ulang dari nol.
 
-Ini memang berarti berkasnya terkirim dua kali — tidak berarti apa-apa untuk CSV beberapa ratus baris. Yang dibeli dengan itu sepadan: tidak ada token yang bisa kedaluwarsa di tengah pekerjaan, tidak ada berkas yatim yang menumpuk, dan tidak ada pembersih berkala yang harus ditulis dan dirawat. Pemeriksaan ulang juga menangkap perubahan yang terjadi di sela dua langkah — misalnya barcode yang keburu dipakai produk lain.
+Ini memang berarti berkasnya terkirim dua kali, tidak berarti apa-apa untuk CSV beberapa ratus baris. Yang dibeli dengan itu sepadan: tidak ada token yang bisa kedaluwarsa di tengah pekerjaan, tidak ada berkas yatim yang menumpuk, dan tidak ada pembersih berkala yang harus ditulis dan dirawat. Pemeriksaan ulang juga menangkap perubahan yang terjadi di sela dua langkah, misalnya barcode yang keburu dipakai produk lain.
 
-Bila berkasnya berubah di antara kedua langkah, hasil "Jalankan" mengikuti berkas yang terakhir dikirim — dan jawabannya selalu menyebutkan ulang berapa baris yang masuk dan berapa yang gagal, sehingga pemilik tidak pernah menebak apa yang sebenarnya terjadi.
+Bila berkasnya berubah di antara kedua langkah, hasil "Jalankan" mengikuti berkas yang terakhir dikirim, dan jawabannya selalu menyebutkan ulang berapa baris yang masuk dan berapa yang gagal, sehingga pemilik tidak pernah menebak apa yang sebenarnya terjadi.
 
 ## 7.5 Stok
 
 | Metode | Jalur | Guna |
 |---|---|---|
-| POST | `/penyesuaian-stok` | `{produk_id, jumlah, alasan}` — **alasan wajib** |
+| POST | `/penyesuaian-stok` | `{produk_id, jumlah, alasan}`, **alasan wajib** |
 | GET | `/stok/menipis` | Produk di bawah `stok_minimum` |
 | GET | `/stok/minus` | Produk berstok negatif |
 | POST | `/opname` | Buat sesi opname `{kategori_id?}` |
 | GET | `/opname/{id}` | Sesi berikut barisnya |
 | PATCH | `/opname/{id}/item` | Isi stok fisik satu atau beberapa baris |
-| POST | `/opname/{id}/posting` | Ubah selisih menjadi mutasi — **tidak bisa dibatalkan** |
+| POST | `/opname/{id}/posting` | Ubah selisih menjadi mutasi, **tidak bisa dibatalkan** |
 
 ## 7.6 Penjualan
 
-**`POST /penjualan`** — endpoint terpenting di seluruh sistem, karena ia yang menerima antrean offline.
+**`POST /penjualan`**, endpoint terpenting di seluruh sistem, karena ia yang menerima antrean offline.
 
 ```json
 {
@@ -169,20 +169,20 @@ Bila berkasnya berubah di antara kedua langkah, hasil "Jalankan" mengikuti berka
 }
 ```
 
-Setiap baris membawa **`produk_id` + `satuan_id`** (produk yang sudah dikenal) **atau `produk_baru`** (hasil "tambah cepat", termasuk yang dibuat saat offline) — tidak pernah keduanya, dan tidak pernah kosong keduanya.
+Setiap baris membawa **`produk_id` + `satuan_id`** (produk yang sudah dikenal) **atau `produk_baru`** (hasil "tambah cepat", termasuk yang dibuat saat offline), tidak pernah keduanya, dan tidak pernah kosong keduanya.
 
 Perilaku server:
 
 | Keadaan | Jawaban |
 |---|---|
-| `uuid_klien` nota belum ada | `201` — disimpan, stok dipotong |
-| `uuid_klien` nota sudah ada | `200` — data yang tersimpan sebelumnya, **tanpa memotong stok lagi** |
+| `uuid_klien` nota belum ada | `201`, disimpan, stok dipotong |
+| `uuid_klien` nota sudah ada | `200`, data yang tersimpan sebelumnya, **tanpa memotong stok lagi** |
 | Baris ber-`produk_baru`, UUID produk belum ada | Produk `perlu_dilengkapi` dibuat beserta satuan dasarnya, dalam transaksi yang sama |
-| Baris ber-`produk_baru`, UUID produk sudah ada | Produk yang sudah ada dipakai — tidak pernah tercipta kembar |
+| Baris ber-`produk_baru`, UUID produk sudah ada | Produk yang sudah ada dipakai, tidak pernah tercipta kembar |
 | Baris memuat `produk_id` **dan** `produk_baru` | `422` `RUJUKAN_PRODUK_GANDA` |
 | Data tidak sah | `422` berikut `kode` dan `pesan` |
 
-Server **menghitung ulang** `subtotal` dan `total` dari `harga_satuan` dan `jumlah`, lalu menolak bila hasilnya berbeda dari yang dikirim. Yang diterima apa adanya hanyalah `harga_satuan` — karena angka itulah yang tercetak di struk dan disepakati pembeli ([bab 05](05-sinkronisasi-offline.md) §5.5) — sedangkan penjumlahannya tidak boleh dipercayakan ke perangkat.
+Server **menghitung ulang** `subtotal` dan `total` dari `harga_satuan` dan `jumlah`, lalu menolak bila hasilnya berbeda dari yang dikirim. Yang diterima apa adanya hanyalah `harga_satuan`, karena angka itulah yang tercetak di struk dan disepakati pembeli ([bab 05](05-sinkronisasi-offline.md) §5.5), sedangkan penjumlahannya tidak boleh dipercayakan ke perangkat.
 
 Server juga mengisi sendiri `hpp_saat_itu` tiap baris; perangkat tidak pernah mengirimkannya dan memang tidak memilikinya.
 
@@ -198,7 +198,7 @@ Server juga mengisi sendiri `hpp_saat_itu` tiap baris; perangkat tidak pernah me
 |---|---|---|
 | POST | `/sesi-kas` | Buka `{modal_awal}` |
 | GET | `/sesi-kas/aktif` | Sesi terbuka milik pengguna berjalan |
-| POST | `/sesi-kas/{id}/tutup` | `{kas_fisik, catatan?}` — ditolak bila selisih ≠ 0 tanpa catatan |
+| POST | `/sesi-kas/{id}/tutup` | `{kas_fisik, catatan?}`, ditolak bila selisih ≠ 0 tanpa catatan |
 | GET | `/sesi-kas?dari=&sampai=` | Riwayat sesi |
 
 ## 7.8 Pembelian
@@ -208,12 +208,12 @@ Server juga mengisi sendiri `hpp_saat_itu` tiap baris; perangkat tidak pernah me
 | GET POST | `/pemasok` | Daftar & tambah |
 | PATCH | `/pemasok/{id}` | Ubah; menonaktifkan lewat `{aktif: false}` |
 | GET POST | `/pembelian` | Daftar & buat draft |
-| PATCH | `/pembelian/{id}` | Ubah — **hanya selama berstatus draft** |
+| PATCH | `/pembelian/{id}` | Ubah, **hanya selama berstatus draft** |
 | POST | `/pembelian/{id}/terima` | Stok bertambah, HPP dihitung ulang, faktur terkunci |
 | POST | `/pembelian/{id}/pembayaran` | `{jumlah, tanggal, metode, catatan?}` |
 | GET | `/pembelian/hutang?jatuh_tempo_sebelum=` | Hutang yang belum lunas |
 
-`POST /pembelian/{id}/terima` mengembalikan saran harga jual baru untuk tiap produk yang harga belinya naik (BEL-05). **Saran tidak pernah diterapkan sendiri** — pemilik yang memutuskan lewat `PATCH /satuan/{id}`.
+`POST /pembelian/{id}/terima` mengembalikan saran harga jual baru untuk tiap produk yang harga belinya naik (BEL-05). **Saran tidak pernah diterapkan sendiri**, pemilik yang memutuskan lewat `PATCH /satuan/{id}`.
 
 ## 7.9 Laporan
 

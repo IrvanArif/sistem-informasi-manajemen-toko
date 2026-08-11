@@ -2,7 +2,7 @@
 
 Setiap alur ditulis sebagai langkah yang bisa ditelusuri, karena alur inilah yang nanti diterjemahkan langsung menjadi uji ujung-ke-ujung di [bab 10](10-strategi-pengujian.md).
 
-## 4.1 Kasir — satu hari kerja
+## 4.1 Kasir, satu hari kerja
 
 ```
 buka sesi kas  →  [ transaksi  ×  N ]  →  tutup sesi kas
@@ -14,7 +14,7 @@ buka sesi kas  →  [ transaksi  ×  N ]  →  tutup sesi kas
 2. Bila belum ada sesi terbuka atas namanya, sistem meminta **modal awal laci**.
 3. Sesi tercatat dengan waktu buka. Layar kasir baru bisa dipakai setelah ini.
 
-Tanpa sesi, kas fisik tidak bisa dicocokkan di akhir hari — jadi langkah ini tidak bisa dilewati.
+Tanpa sesi, kas fisik tidak bisa dicocokkan di akhir hari, jadi langkah ini tidak bisa dilewati.
 
 ### Melayani satu transaksi (KAS-02 s.d. KAS-10, KAS-13, KAS-15)
 
@@ -32,15 +32,15 @@ Tanpa sesi, kas fisik tidak bisa dicocokkan di akhir hari — jadi langkah ini t
 
 1. **Barcode persis** pada `satuan_produk` → produk **dan** satuannya langsung tertentu, tidak ada pertanyaan lanjutan.
 2. **Kode produk persis**.
-3. **Nama mengandung kata kunci**, diurutkan berdasarkan seberapa sering produk itu terjual belakangan — barang yang laris muncul lebih dulu.
+3. **Nama mengandung kata kunci**, diurutkan berdasarkan seberapa sering produk itu terjual belakangan, barang yang laris muncul lebih dulu.
 
 Pencarian dijalankan atas salinan katalog di perangkat. Inilah yang membuatnya seketika dan tetap hidup saat internet mati.
 
-**Dua jalan untuk setiap tindakan.** Pintasan papan ketik memakai F-key (`F2` ubah jumlah, `F3` hapus baris, `F4` diskon nota, `F6` gantung, `F9` bayar, `Esc` batal), dan **setiap tindakan itu juga punya tombol di layar** — sehingga alur yang sama bisa diselesaikan dengan sentuhan di tablet atau HP ([bab 06 §6.3](06-antarmuka.md#63-layar-kasir)). Di laptop, F-key menuntut Fn-lock disetel saat pemasangan; syarat itu tercatat di [bab 11 §11.4](11-rilis-bertahap.md#114-peralihan-tanpa-menghentikan-toko).
+**Dua jalan untuk setiap tindakan.** Pintasan papan ketik memakai F-key (`F2` ubah jumlah, `F3` hapus baris, `F4` diskon nota, `F6` gantung, `F9` bayar, `Esc` batal), dan **setiap tindakan itu juga punya tombol di layar**, sehingga alur yang sama bisa diselesaikan dengan sentuhan di tablet atau HP ([bab 06 §6.3](06-antarmuka.md#63-layar-kasir)). Di laptop, F-key menuntut Fn-lock disetel saat pemasangan; syarat itu tercatat di [bab 11 §11.4](11-rilis-bertahap.md#114-peralihan-tanpa-menghentikan-toko).
 
 **Pemilihan satuan.** Bila produk punya lebih dari satu satuan dan bukan hasil pindaian barcode, kasir memilih satuan lebih dulu. Bila hanya ada satu satuan, langkah ini dilewati diam-diam.
 
-**Jumlah.** Nilai awal `1`. Untuk barang curah, kasir mengetik angka pecahan (`1,5`). Sistem menerima koma maupun titik sebagai pemisah desimal — pengguna Indonesia mengetik koma, papan ketik angka mengeluarkan titik, dan memaksanya konsisten cuma akan memperlambat kasir.
+**Jumlah.** Nilai awal `1`. Untuk barang curah, kasir mengetik angka pecahan (`1,5`). Sistem menerima koma maupun titik sebagai pemisah desimal, pengguna Indonesia mengetik koma, papan ketik angka mengeluarkan titik, dan memaksanya konsisten cuma akan memperlambat kasir.
 
 **Perhitungan tiap baris:**
 
@@ -55,17 +55,17 @@ Pembulatan dilakukan sekali, di tingkat baris.
 
 - Tunai: kasir mengetik uang diterima; kembalian dihitung. Tersedia tombol pecahan cepat (Rp5.000 / 10.000 / 20.000 / 50.000 / 100.000 dan "uang pas").
 - Transfer / QRIS: hanya dicatat metodenya. v1 tidak terhubung ke penyedia pembayaran mana pun.
-- Bila `pembulatan_nota` diatur ke Rp100 atau Rp500, total dibulatkan dan selisihnya tersimpan di kolom `pembulatan` — bukan disembunyikan ke dalam diskon.
+- Bila `pembulatan_nota` diatur ke Rp100 atau Rp500, total dibulatkan dan selisihnya tersimpan di kolom `pembulatan`, bukan disembunyikan ke dalam diskon.
 
 **Penyimpanan transaksi.** Nota selalu ditulis ke penyimpanan lokal lebih dulu, lengkap dengan `uuid_klien` dan `nomor_nota` yang dibuat di perangkat. Barulah pengiriman ke server diusahakan. Urutan ini penting: kalau pengiriman yang didahulukan, transaksi bisa hilang ketika jaringan putus di tengah jalan.
 
 **Struk tidak menjadi bagian dari alur menyelesaikan transaksi.** Toko belum punya printer, jadi setelah pembayaran dikonfirmasi layar langsung menampilkan kembalian dan siap menerima transaksi berikutnya. Tombol **Cetak struk** tersedia untuk dipakai bila printer ada, memakai lembar gaya khusus lebar 58 mm dan 80 mm.
 
-Bila pengaturan `cetak_otomatis` dinyalakan — dilakukan saat printer dibeli di M8 — dialog cetak muncul sendiri setelah setiap transaksi. Nota lama selalu bisa dicetak ulang dari daftar penjualan.
+Bila pengaturan `cetak_otomatis` dinyalakan, dilakukan saat printer dibeli di M8, dialog cetak muncul sendiri setelah setiap transaksi. Nota lama selalu bisa dicetak ulang dari daftar penjualan.
 
 ### Transaksi tergantung (KAS-06)
 
-Kasir menggantung keranjang yang sedang berjalan, melayani pembeli lain, lalu memanggilnya kembali. Keranjang tergantung disimpan lokal dan tidak pernah dikirim ke server — ia belum menjadi penjualan.
+Kasir menggantung keranjang yang sedang berjalan, melayani pembeli lain, lalu memanggilnya kembali. Keranjang tergantung disimpan lokal dan tidak pernah dikirim ke server. Ia belum menjadi penjualan.
 
 ### Retur (KAS-11)
 
@@ -75,7 +75,7 @@ Kasir menggantung keranjang yang sedang berjalan, melayani pembeli lain, lalu me
 4. Sistem memeriksa jumlah retur ≤ sisa baris asal.
 5. Terbentuk `retur_penjualan` + mutasi stok bertipe `retur_penjualan` (bertanda positif), dan status nota asal berubah menjadi `sebagian_diretur` atau `diretur_penuh`.
 
-**Nota asal tidak pernah diubah atau dihapus.** Koreksi selalu berupa catatan baru — itu yang membuat riwayat tetap bisa dipercaya.
+**Nota asal tidak pernah diubah atau dihapus.** Koreksi selalu berupa catatan baru. Itu yang membuat riwayat tetap bisa dipercaya.
 
 Retur hanya bisa dilakukan saat online, karena membutuhkan nota asal yang mungkin tidak ada di perangkat ini.
 
@@ -89,7 +89,7 @@ Retur hanya bisa dilakukan saat online, karena membutuhkan nota asal yang mungki
 
 Sistem tidak pernah "membetulkan" selisih. Selisih adalah kenyataan yang perlu dilihat, bukan angka yang perlu dirapikan.
 
-**Penutupan sesi menuntut antrean kosong.** Bila masih ada penjualan menunggu kirim, sesi tidak boleh ditutup — kas sistem belum lengkap dan hasil pencocokannya pasti menyesatkan.
+**Penutupan sesi menuntut antrean kosong.** Bila masih ada penjualan menunggu kirim, sesi tidak boleh ditutup, kas sistem belum lengkap dan hasil pencocokannya pasti menyesatkan.
 
 ## 4.2 Katalog & stok
 
@@ -99,8 +99,8 @@ Karena toko belum punya data digital sama sekali, jalur ini menentukan apakah si
 
 1. Pemilik mengunduh berkas CSV contoh berisi kepala kolom yang benar.
 2. Mengunggah berkas isian.
-3. Sistem menampilkan **pratinjau**: berapa baris akan masuk, berapa gagal, dan **tiap kegagalan menyebut nomor baris beserta alasannya** — bukan sekadar "impor gagal".
-4. Pemilik memperbaiki berkas lalu mengulang dari langkah 2, atau melanjutkan hanya dengan baris yang sah — **berkas yang sama dikirim ulang** dan diperiksa ulang dari nol, karena pratinjau tidak menyimpan apa pun di server.
+3. Sistem menampilkan **pratinjau**: berapa baris akan masuk, berapa gagal, dan **tiap kegagalan menyebut nomor baris beserta alasannya**, bukan sekadar "impor gagal".
+4. Pemilik memperbaiki berkas lalu mengulang dari langkah 2, atau melanjutkan hanya dengan baris yang sah, **berkas yang sama dikirim ulang** dan diperiksa ulang dari nol, karena pratinjau tidak menyimpan apa pun di server.
 5. Baris yang masuk membuat produk, satuan dasarnya, dan bila kolom stok awal terisi, satu mutasi bertipe `stok_awal`.
 
 Impor bersifat **semua-atau-tidak per baris**, tidak pernah separuh produk terbentuk.
@@ -111,11 +111,11 @@ Kasir menemukan barang yang belum terdaftar sementara pembeli menunggu. Ia mengi
 
 Daftar "perlu dilengkapi" muncul di dashboard pemilik untuk dirapikan belakangan.
 
-**Saat offline, produk ini belum punya `id` dari server.** Perangkat membuatkan `uuid_klien` untuknya dan menyimpannya lokal, lalu baris nota merujuk produk itu lewat UUID tersebut, bukan lewat `produk_id`. Server membuat produknya saat menerima nota, memakai UUID itu sebagai kunci idempotensi — sehingga barang yang sama, yang ditambahkan kilat sekali lalu terjual di lima nota berbeda, tetap menghasilkan **satu** produk. Rinciannya di [bab 07 §7.6](07-kontrak-api.md#76-penjualan).
+**Saat offline, produk ini belum punya `id` dari server.** Perangkat membuatkan `uuid_klien` untuknya dan menyimpannya lokal, lalu baris nota merujuk produk itu lewat UUID tersebut, bukan lewat `produk_id`. Server membuat produknya saat menerima nota, memakai UUID itu sebagai kunci idempotensi, sehingga barang yang sama, yang ditambahkan kilat sekali lalu terjual di lima nota berbeda, tetap menghasilkan **satu** produk. Rinciannya di [bab 07 §7.6](07-kontrak-api.md#76-penjualan).
 
-Ini satu-satunya jalan penulisan katalog yang diizinkan saat offline, dan ia diizinkan justru karena ia bagian dari penjualan — bukan pengelolaan katalog.
+Ini satu-satunya jalan penulisan katalog yang diizinkan saat offline, dan ia diizinkan justru karena ia bagian dari penjualan, bukan pengelolaan katalog.
 
-Stok produk seperti ini akan langsung minus — dan itu memang tujuannya. Angka minus adalah pengingat yang jujur bahwa barang ini belum pernah dicatat masuk.
+Stok produk seperti ini akan langsung minus, dan itu memang tujuannya. Angka minus adalah pengingat yang jujur bahwa barang ini belum pernah dicatat masuk.
 
 ### Penyesuaian manual (STK-06)
 
@@ -127,7 +127,7 @@ Kolom alasan yang boleh kosong akan selalu kosong. Enam bulan kemudian tidak ada
 
 1. Pemilik membuat sesi opname, memilih seluruh produk atau satu kategori.
 2. Sistem **membekukan `stok_sistem`** tiap baris pada saat pembuatan.
-3. Pemilik keliling rak sambil memegang HP, mengisi `stok_fisik` per baris. Sesi boleh ditinggal dan dilanjutkan nanti — statusnya masih `draft`.
+3. Pemilik keliling rak sambil memegang HP, mengisi `stok_fisik` per baris. Sesi boleh ditinggal dan dilanjutkan nanti, statusnya masih `draft`.
 4. Selisih ditampilkan, diurutkan dari yang terbesar.
 5. Saat diposting, tiap baris berselisih menghasilkan satu mutasi bertipe `opname`, dan stok produk menjadi sama dengan hitungan fisik.
 
@@ -159,10 +159,10 @@ Bila harga beli naik dibanding penerimaan sebelumnya, sistem menampilkan saran h
 
 ```
 margin_lama  = (harga_jual_sekarang − hpp_lama) ÷ hpp_lama
-harga_saran  = bulatkan_ke_atas( hpp_baru × (1 + margin_lama) , 100 )
+harga_saran  = bulatkan_ke_atas( hpp_baru × (1 + margin_lama), 100 )
 ```
 
-Ini **hanya saran**. Pemilik menyetujui, mengubah, atau mengabaikannya. Harga jual adalah keputusan dagang — dipengaruhi harga tetangga, kebiasaan pembeli, dan angka yang enak diucapkan — bukan hasil rumus.
+Ini **hanya saran**. Pemilik menyetujui, mengubah, atau mengabaikannya. Harga jual adalah keputusan dagang, dipengaruhi harga tetangga, kebiasaan pembeli, dan angka yang enak diucapkan, bukan hasil rumus.
 
 ### Hutang (BEL-06, BEL-07)
 

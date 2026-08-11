@@ -63,3 +63,6 @@ Thumbs.db
 !.vscode/extensions.json
 *.log
 .claude/
+
+# Hasil bangkitan, dibuat ulang dengan: npm run tipe
+backend/openapi.json

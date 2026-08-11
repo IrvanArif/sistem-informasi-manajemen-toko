@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Warna teks utama sengaja gelap di atas putih. Toko sering terang oleh
+   cahaya matahari dan layar kasir sering murah, sehingga teks abu muda
+   tidak terbaca di sana (bab 06 §6.6). */
+@theme {
+  --color-teks: oklch(0.21 0 0);
+  --color-teks-lembut: oklch(0.44 0 0);
+  --color-garis: oklch(0.87 0 0);
+}
+
+body {
+  background: white;
+  color: var(--color-teks);
+}

@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
+from app.kesalahan import KesalahanDomain
 from app.konfigurasi import ambil_pengaturan
 from app.rute import sehat
 
@@ -25,6 +27,12 @@ def buat_aplikasi() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    @aplikasi.exception_handler(KesalahanDomain)
+    async def tangani_kesalahan_domain(
+        _: Request, e: KesalahanDomain
+    ) -> JSONResponse:
+        return JSONResponse(status_code=e.status, content=e.sebagai_jawaban())
+
     aplikasi.include_router(sehat.rute, prefix="/api/v1")
     return aplikasi
 

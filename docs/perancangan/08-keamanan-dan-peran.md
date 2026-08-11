@@ -104,12 +104,23 @@ Tidak ada kunci layar berbasis PIN di v1. Komputer kasir berada di dalam toko da
 |---|---|
 | Pengangkutan data | HTTPS wajib; HSTS menyala |
 | CORS | Hanya asal frontend yang diizinkan, bukan `*` |
+| Dokumentasi API | `/docs` dan `/openapi.json` **tidak disajikan di produksi**, diatur lewat `LINGKUNGAN=produksi` |
 | Suntikan SQL | Seluruh kueri lewat SQLAlchemy berparameter; tidak ada perangkaian string |
 | Validasi masukan | Pydantic di batas terluar; layanan tidak pernah menerima data mentah |
 | Rahasia | Lewat variabel lingkungan; `.env` tidak pernah masuk repositori |
 | Dependensi | `pip-audit` dan `npm audit` berjalan di CI |
 | Unggahan CSV | Batas ukuran, hanya `text/csv`, diproses di memori tanpa disimpan |
 | Jejak audit | `mutasi_stok` dan `penjualan` sudah menjadi jejak; ditambah catatan untuk kegagalan masuk dan perubahan harga jual |
+
+### Dokumentasi API tidak terbuka di produksi
+
+FastAPI menyajikan `/docs` dan `/openapi.json` secara bawaan. Keduanya sangat berguna saat mengembangkan, dan menjadi beban saat melayani toko: siapa pun bisa membaca seluruh peta endpoint berikut bentuk datanya tanpa perlu satu akun pun.
+
+Karena itu keduanya dimatikan bila `LINGKUNGAN=produksi`.
+
+> Ini **bukan** pengamanan lewat kerahasiaan. Endpoint tetap bisa ditemukan oleh siapa pun yang mau berusaha, dan seluruh rancangannya memang tertulis terbuka di dokumen ini. Yang dihapus hanyalah daftar siap pakai yang membuat penjelajahan otomatis menjadi murah. Penjagaan yang sesungguhnya tetap berupa otentikasi, hak akses per rute, dan pembatasan percobaan masuk.
+
+Pembangkitan tipe TypeScript tidak terpengaruh, karena skema OpenAPI dibaca langsung dari objek aplikasi di Python, bukan lewat HTTP.
 
 ## 8.5 Pencadangan
 

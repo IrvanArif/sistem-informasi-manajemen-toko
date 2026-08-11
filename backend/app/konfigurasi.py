@@ -9,6 +9,10 @@ class Pengaturan(BaseSettings):
     database_url: str = ""
     rahasia_jwt: str
     asal_frontend: str = "http://localhost:5173"
+    # "pengembangan" atau "produksi". Menentukan apakah dokumentasi API
+    # terbuka. Bawaannya pengembangan supaya menjalankan di laptop tidak
+    # perlu disetel apa pun; penempatan wajib menyetelnya ke "produksi".
+    lingkungan: str = "pengembangan"
     umur_token_akses_menit: int = 15
     umur_token_segar_hari: int = 30
 

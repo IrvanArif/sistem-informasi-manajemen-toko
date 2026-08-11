@@ -275,6 +275,10 @@ relatif terhadap tempat aplikasi dijalankan.
 DATABASE_URL=
 RAHASIA_JWT=ganti_dengan_hasil__openssl_rand_hex_32
 ASAL_FRONTEND=http://localhost:5173
+
+# "pengembangan" atau "produksi". Di produksi, /docs dan /openapi.json
+# tidak disajikan. WAJIB disetel "produksi" saat penempatan.
+LINGKUNGAN=pengembangan
 ```
 
 Tambahkan ke `.gitignore`:
@@ -333,6 +337,9 @@ class Pengaturan(BaseSettings):
     database_url: str = ""
     rahasia_jwt: str
     asal_frontend: str = "http://localhost:5173"
+    # "pengembangan" atau "produksi". Menentukan apakah dokumentasi API
+    # terbuka. Penempatan wajib menyetelnya ke "produksi".
+    lingkungan: str = "pengembangan"
     umur_token_akses_menit: int = 15
     umur_token_segar_hari: int = 30
 
@@ -447,7 +454,15 @@ from app.rute import sehat
 
 
 def buat_aplikasi() -> FastAPI:
-    aplikasi = FastAPI(title="Sistem Informasi Manajemen Toko", version="0.1.0")
+    produksi = ambil_pengaturan().lingkungan == "produksi"
+    aplikasi = FastAPI(
+        title="Sistem Informasi Manajemen Toko",
+        version="0.1.0",
+        # Di produksi, peta endpoint tidak disajikan ke publik.
+        docs_url=None if produksi else "/docs",
+        redoc_url=None,
+        openapi_url=None if produksi else "/openapi.json",
+    )
     aplikasi.add_middleware(
         CORSMiddleware,
         allow_origins=[ambil_pengaturan().asal_frontend],
@@ -2604,7 +2619,7 @@ CMD ["sh", "-c", "uv run alembic upgrade head && uv run uvicorn app.main:app --h
 
 1. Buat proyek PostgreSQL di Neon, salin URL sambungannya.
 2. Di Render, buat Web Service dari repositori ini, tipe **Free**, akar `backend/`.
-3. Isi variabel lingkungan: `DATABASE_URL` (dari Neon), `RAHASIA_JWT` (hasil `openssl rand -hex 32`), `ASAL_FRONTEND` (URL Cloudflare Pages dari Langkah 3).
+3. Isi variabel lingkungan: `DATABASE_URL` (dari Neon), `RAHASIA_JWT` (hasil `openssl rand -hex 32`), `ASAL_FRONTEND` (URL Cloudflare Pages dari Langkah 3), dan **`LINGKUNGAN=produksi`** agar `/docs` serta `/openapi.json` tidak terbuka untuk umum.
 
 > **Bila di titik mana pun diminta data pembayaran, berhenti.** Catat di `catatan-penempatan.md` dan laporkan sebelum melanjutkan (G1).
 
@@ -2618,6 +2633,11 @@ Lewat Render Shell:
 
 ```bash
 uv run python -m app.perintah.buat_pemilik irvan "Irvan" <sandi-kuat>
+```
+
+> **Jangan memakai `rahasia123`** dari contoh-contoh di dokumen ini. Sandi itu hanya untuk basis data pengembangan di laptop, dan seluruh dokumen ini terbuka untuk umum.
+
+```bash
 ```
 
 - [ ] **Langkah 5: Pastikan hidup dari ujung ke ujung**

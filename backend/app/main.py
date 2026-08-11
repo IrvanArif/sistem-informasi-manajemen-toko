@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.kesalahan import KesalahanDomain
 from app.konfigurasi import ambil_pengaturan
-from app.rute import sehat
+from app.rute import auth, pengguna, sehat
 
 
 def buat_aplikasi() -> FastAPI:
@@ -33,7 +33,8 @@ def buat_aplikasi() -> FastAPI:
     ) -> JSONResponse:
         return JSONResponse(status_code=e.status, content=e.sebagai_jawaban())
 
-    aplikasi.include_router(sehat.rute, prefix="/api/v1")
+    for r in (sehat.rute, auth.rute, pengguna.rute):
+        aplikasi.include_router(r, prefix="/api/v1")
     return aplikasi
 
 

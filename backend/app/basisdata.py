@@ -19,9 +19,14 @@ def ambil_mesin() -> Engine:
     return create_engine(url_basisdata(), pool_pre_ping=True)
 
 
+def BuatSesi() -> Session:
+    """Sesi baru untuk pemakaian di luar permintaan HTTP, misalnya perintah."""
+    pabrik = sessionmaker(bind=ambil_mesin(), autoflush=False, expire_on_commit=False)
+    return pabrik()
+
+
 def ambil_sesi() -> Iterator[Session]:
-    Buat = sessionmaker(bind=ambil_mesin(), autoflush=False, expire_on_commit=False)
-    sesi = Buat()
+    sesi = BuatSesi()
     try:
         yield sesi
     finally:

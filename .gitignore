@@ -1,0 +1,65 @@
+# ─────────────────────────────────────────────────────────────
+# Rahasia & konfigurasi — tidak pernah masuk repositori
+# ─────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.contoh
+*.pem
+*.key
+*.p12
+secrets/
+kredensial*
+*.age
+*.gpg
+
+# Cadangan basis data
+*.sql
+*.dump
+*.sql.gz
+cadangan/
+backup/
+
+# Data PostgreSQL pengembangan (dibawa pgserver, bukan sistem)
+backend/data_pg/
+
+# ─────────────────────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# ─────────────────────────────────────────────────────────────
+# Node / frontend
+# ─────────────────────────────────────────────────────────────
+node_modules/
+.vite/
+frontend/dist/
+*.tsbuildinfo
+.eslintcache
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# ─────────────────────────────────────────────────────────────
+# Perkakas & sistem
+# ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+.claude/

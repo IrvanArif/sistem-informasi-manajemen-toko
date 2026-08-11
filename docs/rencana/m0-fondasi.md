@@ -148,7 +148,7 @@ Diharapkan: tiga versi tercetak. Bila `node` tidak ditemukan di terminal baru, j
 ## Tugas 2: Kerangka repositori dan PostgreSQL lokal
 
 **Berkas:**
-- Buat: `backend/pyproject.toml`, `backend/skrip/nyalakan_basisdata.py`, `.env.contoh`, `backend/app/__init__.py`
+- Buat: `backend/pyproject.toml`, `backend/skrip/nyalakan_basisdata.py`, `backend/.env.contoh`, `backend/app/__init__.py`
 - Modifikasi: `.gitignore`
 
 **Antarmuka:**
@@ -178,7 +178,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.3",
-    "httpx>=0.28",
+    "httpx2>=2.10",   # TestClient starlette menganggap httpx lama usang
     "hypothesis>=6.122",
     "ruff>=0.8",
     "mypy>=1.13",
@@ -188,6 +188,19 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.ruff.lint]
+# Ditulis tegas, bukan mengandalkan bawaan ruff, supaya pembaruan ruff
+# tidak diam-diam mengubah aturan yang berlaku di proyek ini.
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Depends() memang dipanggil di nilai bawaan argumen. Itu cara baku
+# FastAPI, bukan jebakan nilai bawaan yang dapat berubah.
+extend-immutable-calls = [
+    "fastapi.Depends", "fastapi.Query", "fastapi.Header",
+    "fastapi.Path", "fastapi.Body", "fastapi.Form", "fastapi.File",
+]
 
 [tool.mypy]
 python_version = "3.12"
@@ -202,6 +215,9 @@ follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Tanpa ini, pytest tidak menemukan paket `app` dan `skrip`, karena proyek
+# ini dijalankan langsung dari sumbernya dan tidak dipasang sebagai paket.
+pythonpath = ["."]
 ```
 
 - [ ] **Langkah 2: Tulis `backend/skrip/nyalakan_basisdata.py`**
@@ -244,10 +260,13 @@ if __name__ == "__main__":
 
 `cleanup_mode=None` penting: tanpanya server ikut mati saat skrip selesai, dan aplikasi tidak akan menemukan apa pun untuk disambungi.
 
-- [ ] **Langkah 3: Tulis `.env.contoh` dan perbarui `.gitignore`**
+- [ ] **Langkah 3: Tulis `backend/.env.contoh` dan perbarui `.gitignore`**
+
+Ditaruh di `backend/`, bukan di akar repositori, karena `env_file=".env"` dibaca
+relatif terhadap tempat aplikasi dijalankan.
 
 ```bash
-# .env.contoh
+# backend/.env.contoh
 # Salin menjadi .env lalu isi. Berkas .env TIDAK pernah masuk repositori.
 #
 # DATABASE_URL boleh dikosongkan saat pengembangan. Bila kosong, aplikasi
@@ -285,7 +304,7 @@ Diharapkan: tercetak `DATABASE_URL=...` lalu `PostgreSQL 16.x on x86_64-pc-linux
 - [ ] **Langkah 5: Commit**
 
 ```bash
-git add backend/pyproject.toml backend/skrip .env.contoh backend/app/__init__.py .gitignore
+git add backend/pyproject.toml backend/skrip backend/.env.contoh backend/app/__init__.py .gitignore
 git commit -m "chore: kerangka repositori dan PostgreSQL tersemat"
 ```
 
@@ -344,23 +363,36 @@ Cadangan ke PostgreSQL tersemat hanya berlaku saat `DATABASE_URL` **kosong**. Di
 ```python
 # app/basisdata.py
 from collections.abc import Iterator
+from functools import lru_cache
 
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.konfigurasi import url_basisdata
 
-mesin = create_engine(url_basisdata(), pool_pre_ping=True)
-BuatSesi = sessionmaker(bind=mesin, autoflush=False, expire_on_commit=False)
+
+@lru_cache
+def ambil_mesin() -> Engine:
+    """Mesin SQLAlchemy, dibuat saat pertama dibutuhkan.
+
+    Sengaja tidak dibuat saat modul diimpor: `url_basisdata()` bisa
+    menyalakan PostgreSQL tersemat, dan itu tidak boleh terjadi hanya
+    karena sebuah berkas mengimpor modul ini. Uji, misalnya, memakai
+    basis datanya sendiri dan tidak pernah butuh basis data pengembangan.
+    """
+    return create_engine(url_basisdata(), pool_pre_ping=True)
 
 
 def ambil_sesi() -> Iterator[Session]:
-    sesi = BuatSesi()
+    Buat = sessionmaker(bind=ambil_mesin(), autoflush=False, expire_on_commit=False)
+    sesi = Buat()
     try:
         yield sesi
     finally:
         sesi.close()
 ```
+
+**Mesin dibuat malas, bukan saat modul diimpor.** Ini penyimpangan dari rancangan awal, dan alasannya baru terlihat saat uji dijalankan: `conftest.py` mengimpor modul ini untuk mengambil `ambil_sesi`, dan pembuatan mesin di tingkat modul akan **menyalakan basis data pengembangan hanya karena sebuah impor** — padahal uji memakai basis datanya sendiri. Efek samping saat impor selalu berakhir seperti ini.
 
 ```python
 # app/model/dasar.py
@@ -456,7 +488,7 @@ def mesin_uji() -> Iterator[Engine]:
     """PostgreSQL 16 sungguhan, sekali pakai, di folder sementara."""
     folder = Path(tempfile.mkdtemp(prefix="uji_toko_pg_"))
     try:
-        uri = pgserver.get_server(folder).get_uri()
+        uri = str(pgserver.get_server(folder).get_uri())
         mesin = create_engine(uri.replace("postgresql://", "postgresql+psycopg://", 1))
         Dasar.metadata.create_all(mesin)
         yield mesin

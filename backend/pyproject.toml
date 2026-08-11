@@ -19,16 +19,34 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.3",
-    "httpx>=0.28",
     "hypothesis>=6.122",
     "ruff>=0.8",
     "mypy>=1.13",
     "pip-audit>=2.7",
+    "httpx2>=2.10.0",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.ruff.lint]
+# Ditulis tegas, bukan mengandalkan bawaan ruff, supaya pembaruan ruff
+# tidak diam-diam mengubah aturan yang berlaku di proyek ini.
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Depends() dan kawan-kawannya memang dipanggil di nilai bawaan argumen.
+# Itu cara baku FastAPI, bukan jebakan nilai bawaan yang dapat berubah.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Header",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Form",
+    "fastapi.File",
+]
 
 [tool.mypy]
 python_version = "3.12"
@@ -43,3 +61,6 @@ follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Tanpa ini, pytest tidak menemukan paket `app` dan `skrip`, karena proyek
+# ini dijalankan langsung dari sumbernya dan tidak dipasang sebagai paket.
+pythonpath = ["."]

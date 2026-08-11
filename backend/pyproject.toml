@@ -23,6 +23,12 @@ dev = [
     "ruff>=0.8",
     "mypy>=1.13",
     "pip-audit>=2.7",
+    # httpx2 BUKAN typosquat, meski namanya berpola mencurigakan. Ia jalur
+    # httpx 2.x, diterbitkan dengan nama distribusi baru. Diperiksa pada
+    # 2026-08-08: penulis Tom Christie (pembuat httpx dan starlette),
+    # sumber github.com/pydantic/httpx2, lisensi BSD-3-Clause, dan
+    # starlette sendiri menulis `import httpx2 as httpx` di testclient.py
+    # serta menganggap httpx lama usang. Terkunci ber-sha256 di uv.lock.
     "httpx2>=2.10.0",
 ]
 

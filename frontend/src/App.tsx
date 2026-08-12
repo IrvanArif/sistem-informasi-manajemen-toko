@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Kategori, Pengguna, SesiKas } from "./api/domain";
-import { hapusToken, minta, sudahMasuk } from "./api/klien";
+import { KesalahanApi, hapusToken, minta, sudahMasuk } from "./api/klien";
 import { LayarImpor } from "./fitur/impor/LayarImpor";
 import { LayarKasir } from "./fitur/kasir/LayarKasir";
 import { BukaSesiKas, TutupSesiKas } from "./fitur/kasir/LayarSesiKas";
@@ -9,6 +9,7 @@ import { LayarPengguna } from "./fitur/pengguna/LayarPengguna";
 import { FormProduk } from "./fitur/produk/FormProduk";
 import { LayarProduk } from "./fitur/produk/LayarProduk";
 import { Tombol } from "./komponen/dasar";
+import { bacaMeta, tulisMeta } from "./lokal/basisdata";
 import { useSinkron } from "./lokal/useSinkron";
 
 type Halaman = "kasir" | "tutup-kas" | "produk" | "produk-baru" | "impor" | "pengguna";
@@ -19,6 +20,11 @@ export default function App() {
   const [halaman, setHalaman] = useState<Halaman>("kasir");
   const [kategori, setKategori] = useState<Kategori[]>([]);
   const [sesiKas, setSesiKas] = useState<SesiKas | null>(null);
+  // Sesi kas belum diketahui bukanlah sama dengan sesi kas tidak ada.
+  // Tanpa pembeda ini, form "Buka sesi kas" sempat tampil padahal sesinya
+  // sedang terbuka, dan kasir bisa mengisi modal awal untuk sesi yang
+  // sudah jalan.
+  const [kasDiperiksa, setKasDiperiksa] = useState(false);
   const { keadaan, kirim } = useSinkron(saya !== null);
 
   const periksaSesi = useCallback(async () => {
@@ -28,10 +34,23 @@ export default function App() {
       return;
     }
     try {
-      setSaya(await minta<Pengguna>("/auth/saya"));
-    } catch {
-      hapusToken();
-      setSaya(null);
+      const pengguna = await minta<Pengguna>("/auth/saya");
+      setSaya(pengguna);
+      await tulisMeta("pengguna", JSON.stringify(pengguna));
+    } catch (e) {
+      // Hanya 401 yang berarti sesinya benar-benar berakhir. Kegagalan
+      // jaringan TIDAK boleh mengeluarkan pengguna: masuk kembali menuntut
+      // server, sehingga kasir yang terusir saat internet mati tidak punya
+      // jalan kembali, dan seluruh kemampuan offline runtuh hanya karena
+      // halaman disegarkan.
+      if (e instanceof KesalahanApi && e.status === 401) {
+        hapusToken();
+        await tulisMeta("pengguna", "");
+        setSaya(null);
+      } else {
+        const tersimpan = await bacaMeta("pengguna");
+        if (tersimpan) setSaya(JSON.parse(tersimpan) as Pengguna);
+      }
     } finally {
       setMemeriksa(false);
     }
@@ -39,10 +58,27 @@ export default function App() {
 
   const muatSesiKas = useCallback(async () => {
     try {
-      setSesiKas(await minta<SesiKas | null>("/sesi-kas/aktif"));
-    } catch {
-      setSesiKas(null);
+      const kas = await minta<SesiKas | null>("/sesi-kas/aktif");
+      setSesiKas(kas);
+      setKasDiperiksa(true);
+      await tulisMeta("sesi_kas_aktif", kas ? JSON.stringify(kas) : "");
+      return;
+    } catch (e) {
+      // Kegagalan jaringan TIDAK berarti sesi kasnya hilang. Menghapusnya
+      // di sini akan melempar kasir kembali ke layar buka sesi setiap kali
+      // internet putus, persis saat ia paling butuh terus melayani.
+      // Hanya sesi yang sudah berakhir yang boleh mengosongkannya.
+      if (e instanceof KesalahanApi && e.status === 401) {
+        setSesiKas(null);
+        setKasDiperiksa(true);
+        return;
+      }
     }
+    // Offline: pakai sesi yang terakhir diketahui, supaya layar kasir tetap
+    // terbuka bahkan setelah halaman dimuat ulang tanpa internet.
+    const tersimpan = await bacaMeta("sesi_kas_aktif");
+    if (tersimpan) setSesiKas(JSON.parse(tersimpan) as SesiKas);
+    setKasDiperiksa(true);
   }, []);
 
   useEffect(() => {
@@ -75,6 +111,8 @@ export default function App() {
             <Tombol
               onClick={() => {
                 hapusToken();
+                void tulisMeta("pengguna", "");
+                void tulisMeta("sesi_kas_aktif", "");
                 setSaya(null);
                 setSesiKas(null);
               }}
@@ -101,7 +139,12 @@ export default function App() {
         </nav>
       </header>
 
+      {halaman === "kasir" && !kasDiperiksa && (
+        <main className="p-4 text-gray-700">Memuat sesi kas...</main>
+      )}
+
       {halaman === "kasir" &&
+        kasDiperiksa &&
         (sesiKas ? (
           <LayarKasir
             sesi={sesiKas}

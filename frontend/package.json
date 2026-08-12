@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:pantau": "vitest",
+    "test:e2e": "playwright test",
     "tipe": "cd ../backend && uv run python -m skrip.ekspor_openapi && cd ../frontend && openapi-typescript ../backend/openapi.json -o src/api/tipe.ts",
     "periksa": "tsc --noEmit",
     "build:www": "VITE_API_DASAR=/toko/api/v1 vite build && rm -rf /var/www/html/toko && cp -r dist /var/www/html/toko"
@@ -20,6 +21,7 @@
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
@@ -28,6 +30,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "dotenv": "^17.4.2",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^30.0.1",
     "openapi-typescript": "^7.13.0",

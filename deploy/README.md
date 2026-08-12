@@ -82,3 +82,38 @@ curl -sI http://localhost/toko/ | head -1      # HTTP/1.1 200 OK
 Bila yang pertama menjawab 404, modul proxy belum aktif atau Apache belum
 dimuat ulang. Bila yang kedua menjawab 403, periksa izin baca folder
 `/var/www/html/toko`.
+
+## Uji offline di browser sungguhan
+
+Kemampuan bekerja tanpa internet tidak bisa dibuktikan oleh uji satuan.
+Service worker hanya ada di hasil bangun, dan hanya browser sungguhan yang
+bisa dimatikan jaringannya lalu disegarkan. Karena itu uji ini dijalankan
+terhadap `http://localhost/toko`, bukan terhadap server pengembangan.
+
+Sekali saja, siapkan akun pengujinya:
+
+```bash
+cd ~/Documents/Toko/frontend
+cp .env.e2e.contoh .env.e2e     # lalu isi dengan akun pengembangan
+npx playwright install chromium
+```
+
+`.env.e2e` tidak pernah ikut terkirim ke repositori. Sandi yang telanjur
+masuk riwayat git tidak bisa ditarik kembali, dan repositori ini publik.
+
+Setiap kali tampilan berubah, bangun ulang lebih dulu. Uji ini membaca apa
+yang dilayani Apache, bukan apa yang ada di kode:
+
+```bash
+npm run build:www
+npm run test:e2e
+```
+
+Empat hal yang dijaganya:
+
+| Uji | Yang runtuh bila gagal |
+|---|---|
+| Katalog tersalin ke perangkat | Pencarian barang mati saat internet putus. |
+| Menjual saat internet mati, lalu antrean terkirim sendiri | Toko berhenti melayani, atau penjualan hilang. |
+| Tiga transaksi offline terkirim tanpa duplikat | Stok dan uang tercatat ganda. |
+| Aplikasi tetap terbuka setelah dimuat ulang tanpa internet | Kasir terkunci di luar, sebab masuk kembali menuntut server. |

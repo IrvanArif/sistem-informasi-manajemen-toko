@@ -34,6 +34,44 @@ describe("antrean penjualan", () => {
     expect(await jumlahMenunggu()).toBe(1);
   });
 
+  // Status daring dibaca dari hasil pengiriman yang sungguhan. Ini penting
+  // karena navigator.onLine melaporkan "online" selama komputer terhubung
+  // ke router, bahkan ketika sambungan ke luar sedang mati, dan itulah
+  // gangguan yang paling sering terjadi di toko.
+  it("menandai kegagalan jaringan sebagai penanda sambungan putus", async () => {
+    await antrekan(NOTA.uuid_klien, NOTA.nomor_nota, NOTA);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("gagal")));
+    const hasil = await kirimAntrean();
+    expect(hasil.jaringanGagal).toBe(true);
+  });
+
+  it("menandai kegagalan server sebagai sambungan putus juga", async () => {
+    await antrekan(NOTA.uuid_klien, NOTA.nomor_nota, NOTA);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jawab({ pesan: "aduh" }, 503)));
+    const hasil = await kirimAntrean();
+    expect(hasil.jaringanGagal).toBe(true);
+  });
+
+  // Penolakan data BUKAN sambungan putus. Kalau keduanya disamakan, bilah
+  // status akan berkata "Offline" padahal servernya terjangkau dan yang
+  // salah justru notanya, sehingga kasir menunggu pengiriman yang tidak
+  // akan pernah datang.
+  it("tidak menganggap nota yang ditolak sebagai sambungan putus", async () => {
+    await antrekan(NOTA.uuid_klien, NOTA.nomor_nota, NOTA);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jawab({ pesan: "salah" }, 422)));
+    const hasil = await kirimAntrean();
+    expect(hasil.jaringanGagal).toBe(false);
+    expect(await jumlahGagal()).toBe(1);
+  });
+
+  it("pengiriman yang berhasil tidak menandai apa pun putus", async () => {
+    await antrekan(NOTA.uuid_klien, NOTA.nomor_nota, NOTA);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jawab({ id: 1 }, 201)));
+    const hasil = await kirimAntrean();
+    expect(hasil.jaringanGagal).toBe(false);
+    expect(hasil.terkirim).toBe(1);
+  });
+
   it("membuang dari antrean setelah terkirim", async () => {
     await antrekan(NOTA.uuid_klien, NOTA.nomor_nota, NOTA);
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jawab({ id: 1 }, 201)));

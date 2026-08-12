@@ -57,6 +57,13 @@ export function useSinkron(aktif: boolean) {
     try {
       const hasil = await kirimAntrean();
       await segarkanHitungan();
+      // Status daring ditentukan oleh hasil permintaan yang sungguhan,
+      // bukan oleh navigator.onLine. Browser melaporkan "online" selama
+      // komputer terhubung ke router, bahkan ketika ISP-nya mati, dan
+      // itulah bentuk gangguan yang paling sering terjadi di toko.
+      if (hasil.terkirim > 0 || hasil.jaringanGagal) {
+        setKeadaan((l) => ({ ...l, daring: !hasil.jaringanGagal }));
+      }
       return hasil.tersisa;
     } finally {
       setKeadaan((l) => ({ ...l, sedangKirim: false }));
@@ -103,8 +110,15 @@ export function useSinkron(aktif: boolean) {
   // Katalog disegarkan saat dibuka dan berkala selama daring.
   useEffect(() => {
     if (!aktif) return;
+    // Sinkron katalog sekaligus menjadi penduga sambungan saat antrean
+    // kosong: kalau ia berhasil, server benar-benar terjangkau.
     const tarik = () => {
-      if (navigator.onLine) void sinkronKatalog().then(segarkanHitungan).catch(() => {});
+      void sinkronKatalog()
+        .then(async () => {
+          setKeadaan((l) => ({ ...l, daring: true }));
+          await segarkanHitungan();
+        })
+        .catch(() => setKeadaan((l) => ({ ...l, daring: false })));
     };
     tarik();
     const selang = window.setInterval(tarik, SELANG_KATALOG_MENIT * 60 * 1000);

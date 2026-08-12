@@ -50,6 +50,10 @@ export interface HasilKirim {
   terkirim: number;
   gagal: number;
   tersisa: number;
+  /** True bila kegagalannya bersifat jaringan, bukan penolakan server.
+   *  Dipakai untuk menentukan status daring, karena navigator.onLine
+   *  melaporkan "online" selama terhubung ke router meski ISP-nya mati. */
+  jaringanGagal: boolean;
 }
 
 /** Mengirim antrean satu per satu, berurutan sesuai waktu pembuatan.
@@ -65,6 +69,7 @@ export async function kirimAntrean(): Promise<HasilKirim> {
 
   let terkirim = 0;
   let gagal = 0;
+  let jaringanGagal = false;
 
   for (const baris of menunggu) {
     try {
@@ -91,6 +96,7 @@ export async function kirimAntrean(): Promise<HasilKirim> {
         kesalahan_terakhir: kesalahan?.pesan ?? "Tidak bisa terhubung ke server",
       });
       gagal += 1;
+      if (kesalahan === null || kesalahan.status >= 500) jaringanGagal = true;
 
       // Berhenti pada kegagalan pertama yang bersifat sementara. Meneruskan
       // ke nota berikutnya hanya akan menumpuk kegagalan yang sama.
@@ -98,7 +104,7 @@ export async function kirimAntrean(): Promise<HasilKirim> {
     }
   }
 
-  return { terkirim, gagal, tersisa: await jumlahMenunggu() };
+  return { terkirim, gagal, jaringanGagal, tersisa: await jumlahMenunggu() };
 }
 
 export async function daftarGagal(): Promise<BarisAntrean[]> {

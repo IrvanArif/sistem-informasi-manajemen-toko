@@ -24,6 +24,7 @@ mengindeksnya. Setiap berkas yang masuk harus lolos satu pertanyaan:
 | `backend/.env` | `.env`, `.env.*` | `RAHASIA_JWT` bocor. Siapa pun bisa menerbitkan token yang diterima sistem, lalu masuk sebagai pemilik tanpa sandi. |
 | `kredensial-lokal.md` | `kredensial*` | Seluruh sandi tercatat di sana. |
 | `backend/data_pg/` | `backend/data_pg/` | Isi basis data: akun, dan kelak seluruh transaksi toko. |
+| `frontend/.env.e2e` | `.env.*` | Akun yang dipakai uji otomatis. Sandi yang masuk riwayat git tidak bisa ditarik kembali, dan repositori ini publik. Contohnya, `.env.e2e.contoh`, sengaja dikecualikan agar tetap terkirim tanpa isi. |
 | Cadangan basis data | `*.sql`, `*.dump`, `cadangan/` | Sama seperti di atas, lengkap. |
 | Kunci apa pun | `*.pem`, `*.key`, `*.p12`, `*.age`, `*.gpg` | Bergantung kuncinya, dan tidak ada yang ringan. |
 | `frontend/node_modules/`, `frontend/dist/` | sudah diabaikan | Bukan rahasia, tetapi hasil bangkitan dan membengkakkan repositori. |
@@ -40,7 +41,7 @@ cd ~/Documents/Toko
 git status --porcelain --untracked-files=all
 
 # 2. Pastikan berkas rahasia benar-benar diabaikan
-for f in backend/.env kredensial-lokal.md backend/data_pg; do
+for f in backend/.env kredensial-lokal.md backend/data_pg frontend/.env.e2e; do
   printf "%-26s %s\n" "$f" \
     "$(git check-ignore -q "$f" && echo diabaikan || echo 'BAHAYA: akan masuk')"
 done

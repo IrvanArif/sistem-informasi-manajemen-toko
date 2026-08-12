@@ -4,6 +4,7 @@
 .env
 .env.*
 !.env.contoh
+!.env.*.contoh
 *.pem
 *.key
 *.p12

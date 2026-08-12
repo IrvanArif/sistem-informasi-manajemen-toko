@@ -1,14 +1,17 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, Query, Response, UploadFile
 from sqlalchemy.orm import Session
 
 from app.basisdata import ambil_sesi
 from app.keamanan.hak_akses import pengguna_berjalan, wajib_pemilik
+from app.kesalahan import KesalahanDomain
+from app.layanan import impor as layanan_impor
 from app.layanan import produk as layanan
 from app.layanan import stok as layanan_stok
 from app.model.pengguna import Pengguna, Peran
 from app.model.produk import Produk
+from app.skema.impor import HasilImpor
 from app.skema.produk import (
     KategoriKeluar,
     KategoriMasuk,
@@ -24,6 +27,27 @@ from app.skema.produk import (
 )
 
 rute = APIRouter(tags=["katalog"])
+
+# Batas ukuran unggahan. Katalog toko kelontong tak sampai sepersepuluh
+# ini, jadi berkas yang lebih besar hampir pasti salah pilih.
+BATAS_UNGGAHAN = 5 * 1024 * 1024
+
+
+def _baca_unggahan(berkas: UploadFile) -> str:
+    isi = berkas.file.read(BATAS_UNGGAHAN + 1)
+    if len(isi) > BATAS_UNGGAHAN:
+        raise KesalahanDomain(
+            "BERKAS_TERLALU_BESAR",
+            "Berkas melebihi 5 MB. Pastikan yang diunggah memang CSV katalog.",
+        )
+    try:
+        return isi.decode("utf-8-sig")
+    except UnicodeDecodeError as e:
+        raise KesalahanDomain(
+            "BERKAS_BUKAN_TEKS",
+            "Berkas tidak terbaca sebagai teks UTF-8. Simpan ulang dari "
+            "aplikasi lembar kerja sebagai CSV UTF-8.",
+        ) from e
 
 
 def _sesuai_peran(produk: Produk | list[Produk], pengguna: Pengguna) -> Any:
@@ -154,3 +178,31 @@ def stok_minus(
     pemilik: Pengguna = Depends(wajib_pemilik),
 ) -> Any:
     return _sesuai_peran(layanan_stok.stok_minus(sesi), pemilik)
+
+
+@rute.get("/produk/impor/contoh")
+def contoh_impor(_: Pengguna = Depends(wajib_pemilik)) -> Response:
+    """Berkas contoh berisi kepala kolom yang benar."""
+    return Response(
+        content=layanan_impor.contoh_csv(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="contoh-produk.csv"'},
+    )
+
+
+@rute.post("/produk/impor/pratinjau", response_model=HasilImpor)
+def pratinjau_impor(
+    berkas: UploadFile = File(...),
+    sesi: Session = Depends(ambil_sesi),
+    _: Pengguna = Depends(wajib_pemilik),
+) -> Any:
+    return layanan_impor.periksa(sesi, _baca_unggahan(berkas))
+
+
+@rute.post("/produk/impor/jalankan", response_model=HasilImpor)
+def jalankan_impor(
+    berkas: UploadFile = File(...),
+    sesi: Session = Depends(ambil_sesi),
+    pemilik: Pengguna = Depends(wajib_pemilik),
+) -> Any:
+    return layanan_impor.jalankan(sesi, _baca_unggahan(berkas), pemilik.id)

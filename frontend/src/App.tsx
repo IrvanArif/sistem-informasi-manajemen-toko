@@ -9,6 +9,7 @@ import { LayarPengguna } from "./fitur/pengguna/LayarPengguna";
 import { FormProduk } from "./fitur/produk/FormProduk";
 import { LayarProduk } from "./fitur/produk/LayarProduk";
 import { Tombol } from "./komponen/dasar";
+import { useSinkron } from "./lokal/useSinkron";
 
 type Halaman = "kasir" | "tutup-kas" | "produk" | "produk-baru" | "impor" | "pengguna";
 
@@ -18,6 +19,7 @@ export default function App() {
   const [halaman, setHalaman] = useState<Halaman>("kasir");
   const [kategori, setKategori] = useState<Kategori[]>([]);
   const [sesiKas, setSesiKas] = useState<SesiKas | null>(null);
+  const { keadaan, kirim } = useSinkron(saya !== null);
 
   const periksaSesi = useCallback(async () => {
     if (!sudahMasuk()) {
@@ -101,7 +103,12 @@ export default function App() {
 
       {halaman === "kasir" &&
         (sesiKas ? (
-          <LayarKasir sesi={sesiKas} onSesiBerubah={() => void muatSesiKas()} />
+          <LayarKasir
+            sesi={sesiKas}
+            onSesiBerubah={() => void muatSesiKas()}
+            keadaan={keadaan}
+            kirimAntrean={kirim}
+          />
         ) : (
           <BukaSesiKas onDibuka={() => void muatSesiKas()} />
         ))}

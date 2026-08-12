@@ -7,7 +7,27 @@ from pydantic import BaseModel, ConfigDict, Field, PlainSerializer
 # Jumlah dikirim sebagai string, bukan angka JSON. Angka dalam JSON adalah
 # pecahan biner 64-bit, sehingga NUMERIC(14,3) yang lewat sana kembali
 # dengan nilai yang tidak persis sama (bab 07 §7.1).
-Jumlah = Annotated[Decimal, PlainSerializer(str, return_type=str)]
+#
+# Angka desimalnya dipatok, bukan sekadar diubah menjadi teks apa adanya.
+# Tanpa itu, bentuk jawaban bergantung pada dari mana objeknya datang:
+# produk yang baru dibuat mengirim "40", sementara produk yang sama
+# setelah dibaca ulang dari basis data mengirim "40.000". Pemakai di sisi
+# browser lalu harus menebak, dan perbandingan teks menjadi tidak bisa
+# dipercaya.
+TIGA = Decimal("0.001")
+EMPAT = Decimal("0.0001")
+
+
+def _tiga_desimal(n: Decimal) -> str:
+    return str(n.quantize(TIGA))
+
+
+def _empat_desimal(n: Decimal) -> str:
+    return str(n.quantize(EMPAT))
+
+
+Jumlah = Annotated[Decimal, PlainSerializer(_tiga_desimal, return_type=str)]
+Tarif = Annotated[Decimal, PlainSerializer(_empat_desimal, return_type=str)]
 
 
 class SatuanKeluar(BaseModel):
@@ -42,7 +62,7 @@ class ProdukKeluar(BaseModel):
     satuan_dasar: str
     stok: Jumlah
     stok_minimum: Jumlah
-    hpp: Jumlah
+    hpp: Tarif
     perlu_dilengkapi: bool
     aktif: bool
     satuan: list[SatuanKeluar]
@@ -120,7 +140,7 @@ class MutasiKeluar(BaseModel):
     tipe: str
     jumlah: Jumlah
     saldo_sesudah: Jumlah
-    hpp_saat_itu: Jumlah
+    hpp_saat_itu: Tarif
     rujukan_tipe: str | None
     rujukan_id: int | None
     alasan: str | None

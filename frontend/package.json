@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:pantau": "vitest",
     "tipe": "cd ../backend && uv run python -m skrip.ekspor_openapi && cd ../frontend && openapi-typescript ../backend/openapi.json -o src/api/tipe.ts",
-    "periksa": "tsc --noEmit"
+    "periksa": "tsc --noEmit",
+    "build:www": "VITE_API_DASAR=/toko/api/v1 vite build && rm -rf /var/www/html/toko && cp -r dist /var/www/html/toko"
   },
   "dependencies": {
     "react": "^19.2.8",

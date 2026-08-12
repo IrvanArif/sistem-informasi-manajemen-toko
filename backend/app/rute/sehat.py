@@ -20,7 +20,8 @@ def akar_penjelas() -> dict[str, str]:
     return {
         "nama": "Sistem Informasi Manajemen Toko",
         "keterangan": "Alamat ini melayani API, bukan tampilan.",
-        "tampilan": "Buka http://localhost:5173 untuk antarmukanya.",
+        "tampilan": "http://localhost/toko untuk pemakaian sehari-hari, "
+        "http://localhost:5173 saat mengembangkan.",
         "kesehatan": "/api/v1/sehat",
     }
 

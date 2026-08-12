@@ -49,5 +49,6 @@ def test_akar_menjelaskan_diri(klien: TestClient) -> None:
     jawaban = klien.get("/")
     assert jawaban.status_code == 200
     isi = jawaban.json()
+    assert "localhost/toko" in isi["tampilan"]
     assert "5173" in isi["tampilan"]
     assert isi["kesehatan"] == "/api/v1/sehat"

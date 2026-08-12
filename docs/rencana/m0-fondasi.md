@@ -2632,7 +2632,10 @@ Di Cloudflare Pages, hubungkan repositori, direktori akar `frontend/`, perintah 
 Lewat Render Shell:
 
 ```bash
-uv run python -m app.perintah.buat_pemilik irvan "Irvan" <sandi-kuat>
+uv run python -m app.perintah.buat_pemilik irvan "Irvan" SandiKuatMu123
+# Ganti SandiKuatMu123 dengan sandi sungguhan. Jangan memakai tanda
+# kurung sudut: di bash, < berarti membaca dari berkas, bukan penanda
+# "isi sendiri", dan perintahnya akan gagal sebelum sempat berjalan.
 ```
 
 > **Jangan memakai `rahasia123`** dari contoh-contoh di dokumen ini. Sandi itu hanya untuk basis data pengembangan di laptop, dan seluruh dokumen ini terbuka untuk umum.

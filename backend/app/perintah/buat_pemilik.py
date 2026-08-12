@@ -50,7 +50,8 @@ def main() -> None:
     if len(sys.argv) != 4:
         print(
             "Pemakaian: python -m app.perintah.buat_pemilik "
-            "<nama_pengguna> <nama_lengkap> <sandi>"
+            "<nama_pengguna> <nama_lengkap> <sandi>\n"
+            "Contoh:    python -m app.perintah.buat_pemilik irvan \"Irvan Arif\" SandiKuatMu123"
         )
         raise SystemExit(1)
     with BuatSesi() as sesi:

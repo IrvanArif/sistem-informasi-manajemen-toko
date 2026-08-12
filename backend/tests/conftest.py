@@ -18,6 +18,8 @@ from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import Engine, create_engine  # noqa: E402
 from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 
+# Mengimpor app.model mendaftarkan SELURUH tabel di metadata.
+import app.model  # noqa: E402, F401
 from app.basisdata import ambil_sesi  # noqa: E402
 from app.main import buat_aplikasi  # noqa: E402
 from app.model.dasar import Dasar  # noqa: E402

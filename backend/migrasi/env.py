@@ -11,12 +11,11 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine
 
+# Mengimpor app.model mendaftarkan seluruh tabel di metadata, sehingga
+# --autogenerate melihat semuanya. Tabel baru cukup ditambahkan ke
+# daftar di app/model/__init__.py.
+import app.model  # noqa: F401
 from app.konfigurasi import url_basisdata
-
-# Seluruh tabel harus diimpor di sini agar terdaftar di metadata dan
-# terbaca oleh --autogenerate. Tabel yang lupa diimpor akan diam-diam
-# dianggap "tidak ada" lalu dihapus oleh migrasi berikutnya.
-from app.model import pengguna, percobaan_masuk, token  # noqa: F401
 from app.model.dasar import Dasar
 
 config = context.config

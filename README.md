@@ -40,7 +40,8 @@ Seluruhnya gratis atau open source: MIT, Apache, ISC, PSF, atau PostgreSQL Licen
 Mulai dari **[spesifikasi induk](docs/spesifikasi.md)**, yang memuat masalah, batasan, lingkup, dan keputusan kunci.
 
 - **[Bab-bab perancangan](docs/perancangan/)**: kebutuhan, arsitektur, model data, alur kerja, sinkronisasi, antarmuka, API, keamanan, penanganan error, pengujian, rilis
-- **[Catatan keputusan arsitektur](docs/adr/)**: delapan keputusan berikut alternatif yang ditolak dan alasannya
+- **[Catatan keputusan arsitektur](docs/adr/)**: sembilan keputusan berikut alternatif yang ditolak dan alasannya
+- **[Kebijakan repositori](docs/kebijakan-repositori.md)**: apa yang boleh dan tidak boleh diunggah, dan apa yang dilakukan bila rahasia telanjur bocor
 
 ## Rencana rilis
 

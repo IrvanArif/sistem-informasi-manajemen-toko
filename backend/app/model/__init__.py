@@ -11,14 +11,27 @@ mendapatkan semuanya. Tabel baru cukup ditambahkan ke daftar ini.
 """
 
 from app.model.dasar import Dasar, KolomWaktu
+from app.model.kas import SesiKas, StatusSesi
 from app.model.kategori import Kategori
 from app.model.mutasi import MutasiStok, TipeMutasi
 from app.model.pengguna import Pengguna, Peran
+from app.model.penjualan import (
+    ItemPenjualan,
+    MetodeBayar,
+    Penjualan,
+    StatusNota,
+)
 from app.model.percobaan_masuk import PercobaanMasuk
 from app.model.produk import JUMLAH, TARIF, Produk, SatuanProduk
 from app.model.token import TokenSegar
 
 __all__ = [
+    "ItemPenjualan",
+    "MetodeBayar",
+    "Penjualan",
+    "SesiKas",
+    "StatusNota",
+    "StatusSesi",
     "JUMLAH",
     "TARIF",
     "Dasar",

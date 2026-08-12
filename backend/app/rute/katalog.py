@@ -28,6 +28,13 @@ from app.skema.produk import (
 
 rute = APIRouter(tags=["katalog"])
 
+# Rute yang menyaring peran menjawab salah satu dari dua bentuk. Keduanya
+# dideklarasikan agar ikut masuk skema OpenAPI, sehingga sisi browser tetap
+# mendapat tipe untuk keduanya. Tanpa ini, anotasi Any membuat bentuk kasir
+# tidak pernah muncul di skema, dan jaminan tipe lintas bahasa hilang
+# justru di tempat yang paling menyangkut kerahasiaan harga modal.
+ProdukSesuaiPeran = ProdukKeluar | ProdukKeluarKasir
+
 # Batas ukuran unggahan. Katalog toko kelontong tak sampai sepersepuluh
 # ini, jadi berkas yang lebih besar hampir pasti salah pilih.
 BATAS_UNGGAHAN = 5 * 1024 * 1024
@@ -63,7 +70,7 @@ def _sesuai_peran(produk: Produk | list[Produk], pengguna: Pengguna) -> Any:
     return bentuk.model_validate(produk)
 
 
-@rute.get("/produk")
+@rute.get("/produk", response_model=list[ProdukSesuaiPeran])
 def daftar_produk(
     cari: str = "",
     kategori_id: int | None = None,
@@ -77,7 +84,7 @@ def daftar_produk(
     return _sesuai_peran(hasil, pengguna)
 
 
-@rute.get("/produk/{produk_id}")
+@rute.get("/produk/{produk_id}", response_model=ProdukSesuaiPeran)
 def satu_produk(
     produk_id: int,
     sesi: Session = Depends(ambil_sesi),
@@ -105,7 +112,7 @@ def ubah_produk(
     return ProdukKeluar.model_validate(layanan.ubah_produk(sesi, produk_id, data))
 
 
-@rute.post("/produk/kilat", status_code=201)
+@rute.post("/produk/kilat", status_code=201, response_model=ProdukSesuaiPeran)
 def produk_kilat(
     data: ProdukKilat,
     sesi: Session = Depends(ambil_sesi),
@@ -164,7 +171,7 @@ def penyesuaian_stok(
     return ProdukKeluar.model_validate(produk)
 
 
-@rute.get("/stok/menipis")
+@rute.get("/stok/menipis", response_model=list[ProdukSesuaiPeran])
 def stok_menipis(
     sesi: Session = Depends(ambil_sesi),
     pemilik: Pengguna = Depends(wajib_pemilik),
@@ -172,7 +179,7 @@ def stok_menipis(
     return _sesuai_peran(layanan_stok.stok_menipis(sesi), pemilik)
 
 
-@rute.get("/stok/minus")
+@rute.get("/stok/minus", response_model=list[ProdukSesuaiPeran])
 def stok_minus(
     sesi: Session = Depends(ambil_sesi),
     pemilik: Pengguna = Depends(wajib_pemilik),

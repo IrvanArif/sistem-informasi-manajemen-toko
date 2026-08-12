@@ -33,6 +33,7 @@ def buat_aplikasi() -> FastAPI:
     ) -> JSONResponse:
         return JSONResponse(status_code=e.status, content=e.sebagai_jawaban())
 
+    aplikasi.include_router(sehat.akar)
     for r in (sehat.rute, auth.rute, pengguna.rute):
         aplikasi.include_router(r, prefix="/api/v1")
     return aplikasi

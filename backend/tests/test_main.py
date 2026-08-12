@@ -1,4 +1,5 @@
 import pytest
+from fastapi.testclient import TestClient
 
 from app.konfigurasi import ambil_pengaturan
 from app.main import buat_aplikasi
@@ -41,3 +42,12 @@ def test_cors_tidak_pernah_mengizinkan_semua_asal() -> None:
             asal.extend(str(a) for a in nilai)
     assert asal, "CORS harus menyebut asal secara tegas"
     assert "*" not in asal
+
+
+def test_akar_menjelaskan_diri(klien: TestClient) -> None:
+    """Membuka alamat backend di browser harus memberi tahu ke mana harus pergi."""
+    jawaban = klien.get("/")
+    assert jawaban.status_code == 200
+    isi = jawaban.json()
+    assert "5173" in isi["tampilan"]
+    assert isi["kesehatan"] == "/api/v1/sehat"

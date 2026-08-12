@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Kategori, Pengguna } from "./api/domain";
+import type { Kategori, Pengguna, SesiKas } from "./api/domain";
 import { hapusToken, minta, sudahMasuk } from "./api/klien";
 import { LayarImpor } from "./fitur/impor/LayarImpor";
+import { LayarKasir } from "./fitur/kasir/LayarKasir";
+import { BukaSesiKas, TutupSesiKas } from "./fitur/kasir/LayarSesiKas";
 import { LayarMasuk } from "./fitur/masuk/LayarMasuk";
 import { LayarPengguna } from "./fitur/pengguna/LayarPengguna";
 import { FormProduk } from "./fitur/produk/FormProduk";
 import { LayarProduk } from "./fitur/produk/LayarProduk";
 import { Tombol } from "./komponen/dasar";
 
-type Halaman = "produk" | "produk-baru" | "impor" | "pengguna";
+type Halaman = "kasir" | "tutup-kas" | "produk" | "produk-baru" | "impor" | "pengguna";
 
 export default function App() {
   const [saya, setSaya] = useState<Pengguna | null>(null);
   const [memeriksa, setMemeriksa] = useState(true);
-  const [halaman, setHalaman] = useState<Halaman>("produk");
+  const [halaman, setHalaman] = useState<Halaman>("kasir");
   const [kategori, setKategori] = useState<Kategori[]>([]);
+  const [sesiKas, setSesiKas] = useState<SesiKas | null>(null);
 
   const periksaSesi = useCallback(async () => {
     if (!sudahMasuk()) {
@@ -32,16 +35,23 @@ export default function App() {
     }
   }, []);
 
+  const muatSesiKas = useCallback(async () => {
+    try {
+      setSesiKas(await minta<SesiKas | null>("/sesi-kas/aktif"));
+    } catch {
+      setSesiKas(null);
+    }
+  }, []);
+
   useEffect(() => {
     void periksaSesi();
   }, [periksaSesi]);
 
   useEffect(() => {
     if (!saya) return;
-    void minta<Kategori[]>("/kategori")
-      .then(setKategori)
-      .catch(() => setKategori([]));
-  }, [saya]);
+    void muatSesiKas();
+    void minta<Kategori[]>("/kategori").then(setKategori).catch(() => setKategori([]));
+  }, [saya, muatSesiKas]);
 
   if (memeriksa) return <main className="p-4 text-gray-700">Memuat...</main>;
   if (!saya) return <LayarMasuk onBerhasil={() => void periksaSesi()} />;
@@ -56,17 +66,27 @@ export default function App() {
             <p className="font-medium text-gray-900">{saya.nama_lengkap}</p>
             <p className="text-sm text-gray-700">{saya.peran}</p>
           </div>
-          <Tombol
-            onClick={() => {
-              hapusToken();
-              setSaya(null);
-            }}
-          >
-            Keluar
-          </Tombol>
+          <div className="flex gap-2">
+            {sesiKas && (
+              <Tombol onClick={() => setHalaman("tutup-kas")}>Tutup kasir</Tombol>
+            )}
+            <Tombol
+              onClick={() => {
+                hapusToken();
+                setSaya(null);
+                setSesiKas(null);
+              }}
+            >
+              Keluar
+            </Tombol>
+          </div>
         </div>
 
         <nav className="flex flex-wrap gap-2 px-4 pb-3">
+          <Menu aktif={halaman === "kasir" || halaman === "tutup-kas"}
+                onClick={() => setHalaman("kasir")}>
+            Kasir
+          </Menu>
           <Menu aktif={halaman.startsWith("produk") || halaman === "impor"}
                 onClick={() => setHalaman("produk")}>
             Produk
@@ -78,6 +98,24 @@ export default function App() {
           )}
         </nav>
       </header>
+
+      {halaman === "kasir" &&
+        (sesiKas ? (
+          <LayarKasir sesi={sesiKas} onSesiBerubah={() => void muatSesiKas()} />
+        ) : (
+          <BukaSesiKas onDibuka={() => void muatSesiKas()} />
+        ))}
+
+      {halaman === "tutup-kas" && sesiKas && (
+        <TutupSesiKas
+          sesi={sesiKas}
+          onDitutup={() => {
+            setSesiKas(null);
+            setHalaman("kasir");
+          }}
+          onBatal={() => setHalaman("kasir")}
+        />
+      )}
 
       {halaman === "produk" && (
         <LayarProduk

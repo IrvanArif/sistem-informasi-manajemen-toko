@@ -23,6 +23,9 @@ export type ProdukMasuk = components["schemas"]["ProdukMasuk"];
 export type Kategori = components["schemas"]["KategoriKeluar"];
 export type HasilImpor = components["schemas"]["HasilImpor"];
 export type Mutasi = components["schemas"]["MutasiKeluar"];
+export type Penjualan = components["schemas"]["PenjualanKeluar"];
+export type SesiKas = components["schemas"]["SesiKasKeluar"];
+export type ItemMasuk = components["schemas"]["ItemMasuk"];
 
 /** Produk sebagaimana diterima peran mana pun. hpp hanya ada untuk pemilik. */
 export type ProdukTampil = ProdukKasir & { hpp?: string };

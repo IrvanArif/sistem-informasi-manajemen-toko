@@ -399,6 +399,101 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sesi-kas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Buka Sesi */
+        post: operations["buka_sesi_api_v1_sesi_kas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sesi-kas/aktif": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sesi Aktif */
+        get: operations["sesi_aktif_api_v1_sesi_kas_aktif_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sesi-kas/{kas_id}/kas-sistem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kas Sistem
+         * @description Kas yang seharusnya ada di laci, untuk dibandingkan saat menutup.
+         */
+        get: operations["kas_sistem_api_v1_sesi_kas__kas_id__kas_sistem_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sesi-kas/{kas_id}/tutup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tutup Sesi */
+        post: operations["tutup_sesi_api_v1_sesi_kas__kas_id__tutup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/penjualan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar Penjualan */
+        get: operations["daftar_penjualan_api_v1_penjualan_get"];
+        put?: never;
+        /**
+         * Catat Penjualan
+         * @description 201 bila baru disimpan, 200 bila UUID-nya sudah pernah masuk.
+         *
+         *     Perbedaan kode itu penting bagi perangkat: 200 berarti pengiriman
+         *     ulang berhasil dikenali, bukan bahwa notanya tercatat dua kali.
+         */
+        post: operations["catat_penjualan_api_v1_penjualan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -435,6 +530,11 @@ export interface components {
             sandi: string;
             peran: components["schemas"]["Peran"];
         };
+        /** BukaSesi */
+        BukaSesi: {
+            /** Modal Awal */
+            modal_awal: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -460,6 +560,55 @@ export interface components {
              */
             tersimpan: number;
         };
+        /** ItemKeluar */
+        ItemKeluar: {
+            /** Id */
+            id: number;
+            /** Produk Id */
+            produk_id: number;
+            /** Nama Produk */
+            nama_produk: string;
+            /** Nama Satuan */
+            nama_satuan: string;
+            /** Jumlah */
+            jumlah: string;
+            /** Jumlah Dasar */
+            jumlah_dasar: string;
+            /** Harga Satuan */
+            harga_satuan: number;
+            /** Diskon */
+            diskon: number;
+            /** Subtotal */
+            subtotal: number;
+            /** Hpp Saat Itu */
+            hpp_saat_itu: string;
+        };
+        /**
+         * ItemMasuk
+         * @description Satu baris nota yang dikirim perangkat.
+         *
+         *     Merujuk produk lewat `produk_id` + `satuan_id` (produk yang sudah
+         *     dikenal) ATAU lewat `produk_baru` (hasil tambah cepat, termasuk yang
+         *     dibuat saat offline). Tidak pernah keduanya (bab 05 §5.5).
+         */
+        ItemMasuk: {
+            /** Produk Id */
+            produk_id?: number | null;
+            /** Satuan Id */
+            satuan_id?: number | null;
+            produk_baru?: components["schemas"]["ProdukKilat"] | null;
+            /** Jumlah */
+            jumlah: number | string;
+            /** Harga Satuan */
+            harga_satuan: number;
+            /**
+             * Diskon
+             * @default 0
+             */
+            diskon: number;
+            /** Subtotal */
+            subtotal: number;
+        };
         /** JawabanToken */
         JawabanToken: {
             /** Token Akses */
@@ -479,6 +628,11 @@ export interface components {
             /** Nama */
             nama: string;
         };
+        /**
+         * MetodeBayar
+         * @enum {string}
+         */
+        MetodeBayar: "tunai" | "transfer" | "qris";
         /** MutasiKeluar */
         MutasiKeluar: {
             /** Id */
@@ -518,6 +672,81 @@ export interface components {
             peran: components["schemas"]["Peran"];
             /** Aktif */
             aktif: boolean;
+        };
+        /** PenjualanKeluar */
+        PenjualanKeluar: {
+            /** Id */
+            id: number;
+            /**
+             * Uuid Klien
+             * Format: uuid
+             */
+            uuid_klien: string;
+            /** Nomor Nota */
+            nomor_nota: string;
+            /** Sesi Kas Id */
+            sesi_kas_id: number;
+            /** Kasir Id */
+            kasir_id: number;
+            /**
+             * Waktu Transaksi
+             * Format: date-time
+             */
+            waktu_transaksi: string;
+            /** Subtotal */
+            subtotal: number;
+            /** Diskon Nota */
+            diskon_nota: number;
+            /** Pembulatan */
+            pembulatan: number;
+            /** Total */
+            total: number;
+            metode_bayar: components["schemas"]["MetodeBayar"];
+            /** Dibayar */
+            dibayar: number;
+            /** Kembalian */
+            kembalian: number;
+            /** Status */
+            status: string;
+            /** Item */
+            item: components["schemas"]["ItemKeluar"][];
+        };
+        /** PenjualanMasuk */
+        PenjualanMasuk: {
+            /**
+             * Uuid Klien
+             * Format: uuid
+             */
+            uuid_klien: string;
+            /** Nomor Nota */
+            nomor_nota: string;
+            /**
+             * Waktu Transaksi
+             * Format: date-time
+             */
+            waktu_transaksi: string;
+            /** @default tunai */
+            metode_bayar: components["schemas"]["MetodeBayar"];
+            /**
+             * Diskon Nota
+             * @default 0
+             */
+            diskon_nota: number;
+            /**
+             * Pembulatan
+             * @default 0
+             */
+            pembulatan: number;
+            /** Total */
+            total: number;
+            /** Dibayar */
+            dibayar: number;
+            /** Kembalian */
+            kembalian: number;
+            /** Catatan */
+            catatan?: string | null;
+            /** Item */
+            item: components["schemas"]["ItemMasuk"][];
         };
         /** PenyesuaianStok */
         PenyesuaianStok: {
@@ -683,6 +912,39 @@ export interface components {
              * @default false
              */
             is_dasar: boolean;
+        };
+        /** SesiKasKeluar */
+        SesiKasKeluar: {
+            /** Id */
+            id: number;
+            /** Kasir Id */
+            kasir_id: number;
+            /**
+             * Waktu Buka
+             * Format: date-time
+             */
+            waktu_buka: string;
+            /** Modal Awal */
+            modal_awal: number;
+            /** Waktu Tutup */
+            waktu_tutup: string | null;
+            /** Kas Sistem */
+            kas_sistem: number | null;
+            /** Kas Fisik */
+            kas_fisik: number | null;
+            /** Selisih */
+            selisih: number | null;
+            /** Catatan */
+            catatan: string | null;
+            /** Status */
+            status: string;
+        };
+        /** TutupSesi */
+        TutupSesi: {
+            /** Kas Fisik */
+            kas_fisik: number;
+            /** Catatan */
+            catatan?: string | null;
         };
         /** UbahPengguna */
         UbahPengguna: {
@@ -1562,6 +1824,214 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HasilImpor"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    buka_sesi_api_v1_sesi_kas_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BukaSesi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SesiKasKeluar"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sesi_aktif_api_v1_sesi_kas_aktif_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SesiKasKeluar"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    kas_sistem_api_v1_sesi_kas__kas_id__kas_sistem_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                kas_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tutup_sesi_api_v1_sesi_kas__kas_id__tutup_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                kas_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TutupSesi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SesiKasKeluar"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    daftar_penjualan_api_v1_penjualan_get: {
+        parameters: {
+            query?: {
+                dari?: string | null;
+                sampai?: string | null;
+                batas?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PenjualanKeluar"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    catat_penjualan_api_v1_penjualan_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PenjualanMasuk"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PenjualanKeluar"];
                 };
             };
             /** @description Validation Error */

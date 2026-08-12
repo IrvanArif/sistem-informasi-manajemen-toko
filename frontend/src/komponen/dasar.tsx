@@ -1,4 +1,9 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+  RefObject,
+} from "react";
 
 /** Tinggi minimum 44px: ukuran sasaran sentuh yang nyaman di HP (NF-07). */
 const TOMBOL_DASAR =
@@ -16,14 +21,22 @@ export function Tombol({
   return <button className={`${TOMBOL_DASAR} ${warna} ${className}`} {...sisa} />;
 }
 
+/** ref diteruskan agar layar kasir bisa mengembalikan fokus ke kolom cari
+ *  setelah tiap barang masuk keranjang. Di React 19, ref cukup diterima
+ *  sebagai properti biasa. */
 export function Kolom({
   label,
+  ref,
   ...sisa
-}: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  ref?: RefObject<HTMLInputElement | null>;
+}) {
   return (
     <label className="block">
       <span className="text-sm font-medium text-gray-900">{label}</span>
       <input
+        ref={ref}
         className="mt-1 w-full min-h-11 rounded border border-gray-400 px-3 py-2
                    text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2"
         {...sisa}
